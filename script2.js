@@ -83,6 +83,43 @@ var exchanges = {
                 "duration" : 35 
             }
         }
+    },
+    "hkse" : {
+        "nameLong" : "Hong Kong Stock Exchange",
+        "nameShort" : "HKEX",
+        "timeZone" : "Asia/Hong_Kong",
+        "sessions" : {
+            "pre" : {
+                "name" : "Pre-Opening",
+                "openHour" : 9,
+                "openMinute" : 0,
+                "duration" : 30
+            },
+            "core" : {
+                "name" : "Morning",
+                "openHour" : 9,
+                "openMinute" : 30,
+                "duration" : 150 
+            },
+            "lunch" : {
+                "name" : "Lunch",
+                "openHour" : 12,
+                "openMinute" : 0,
+                "duration" : 60
+            },
+            "core2" : {
+                "name" : "Afternoon",
+                "openHour" : 13,
+                "openMinute" : 0,
+                "duration" : 180,
+            },
+            "after" : {
+                "name" : "Closing Auction",
+                "openHour" : 16,
+                "openMinute" : 0,
+                "duration" : 10
+            }
+        }
     }
 }
 
@@ -143,7 +180,7 @@ document.getElementById("localCity").innerHTML = localTime.zoneName.split("/")[1
 document.getElementById("exchangeCity").innerHTML = exchangeTime.zoneName.split("/")[1];
 
 function createTableData(exchange, exchangeTime) {
-    var tableData = [];
+    let tableData = [];
     // numberOfSessions = Object.keys(exchange.sessions).length;
     let data = Object.keys(exchange.sessions);
     
@@ -192,18 +229,16 @@ function generateTable(table, data) {
 let currentTable = document.getElementById("lseTable");
 
 let exchangeData = Object.keys(exchanges);
+let container = document.getElementById("tableContainer");
+
 for (key of exchangeData) {
     let exchange = exchanges[key];
     let exchangeTime = localTime.setZone(exchange.timeZone);
-
-
-
-    
     let tableData = createTableData(exchange, exchangeTime);
-    
     let table = document.createElement('table');
     table.setAttribute("id", exchange.nameShort);
-    document.body.insertBefore(table, currentTable);
+    container.appendChild(table);
+    
     generateTable(table, tableData);
     generateTableHead(table, Object.keys(tableData[0]));
     

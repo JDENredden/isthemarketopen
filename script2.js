@@ -19,7 +19,7 @@ var localTime= DateTime.now();
 //         // something really bad happened. Maybe the browser (tab) was inactive?
 //         // possibly special handling to avoid futile "catch up" run
 //     }
-
+localTimeZone = DateTime.local().zoneName;
 
 var exchanges = {
     "nyse" : {
@@ -44,6 +44,43 @@ var exchanges = {
                 "openHour" : 16,
                 "openMinute" : 0,
                 "duration" : 240 
+            }
+        }
+    },
+    "lse" : {
+        "nameLong" : "London Stock Exchange",
+        "nameShort" : "LSE",
+        "timeZone" : "Europe/London",
+        "sessions" : {
+            "pre" : {
+                "name" : "Pre-Trading",
+                "openHour" : 5,
+                "openMinute" : 5,
+                "duration" : 165
+            },
+            "core" : {
+                "name" : "Core",
+                "openHour" : 8,
+                "openMinute" : 0,
+                "duration" : 240 
+            },
+            "lunch" : {
+                "name" : "Lunch",
+                "openHour" : 12,
+                "openMinute" : 0,
+                "duration" : 2
+            },
+            "core2" : {
+                "name" : "Core",
+                "openHour" : 12,
+                "openMinute" : 2,
+                "duration" : 238,
+            },
+            "after" : {
+                "name" : "Post Market",
+                "openHour" : 16,
+                "openMinute" : 40,
+                "duration" : 35 
             }
         }
     }
@@ -107,7 +144,7 @@ document.getElementById("exchangeCity").innerHTML = exchangeTime.zoneName.split(
 
 function createTableData(exchange, exchangeTime) {
     var tableData = [];
-    numberOfSessions = Object.keys(exchange.sessions).length;
+    // numberOfSessions = Object.keys(exchange.sessions).length;
     let data = Object.keys(exchange.sessions);
     
     for (key of data) {
@@ -118,42 +155,18 @@ function createTableData(exchange, exchangeTime) {
             minute: session.openMinute, 
             second: 0 
         });
+        let sessionClose = sessionOpen.plus({ minute: session.duration });
         
         sessionData["Session"] = session.name;
-        sessionData["Exchange Time"] = sessionOpen.toLocaleString(DateTime.TIME_SIMPLE);
-        sessionData["Local Time"] = sessionOpen.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE);
-        sessionData["Relative Time"] = sessionOpen.toRelative({ unit: [ "hours", "minutes"] });
+        sessionData["Exchange Time"] = sessionOpen.toLocaleString(DateTime.TIME_SIMPLE) + " - " + sessionClose.toLocaleString(DateTime.TIME_SIMPLE);
+        sessionData["Local Time"] = sessionOpen.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + " - " + sessionClose.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE);
+        sessionData["Relative Open"] = sessionOpen.toRelative({ unit: [ "hours", "minutes"] });
+        sessionData["Relative Close"] = sessionClose.toRelative();
         
         tableData.push(sessionData);
     }
     return tableData;
 }
-
-
-
-let tableData = createTableData(exchanges.nyse, exchangeTime);
-// console.log(tableDataTest);
-    
-// let tableData = [
-//     { 
-//         "Session": exchanges.nyse.sessions.pre.name, 
-//         "Exchange Time": preOpen.toLocaleString(DateTime.TIME_SIMPLE), 
-//         "Local Time": preOpen.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE), 
-//         "Relative Time": preOpen.toRelative({ unit: [ "hours", "minutes"] })
-//     },
-//     {
-//         "Session": exchanges.nyse.sessions.core.name, 
-//         "Exchange Time": open.toLocaleString(DateTime.TIME_SIMPLE), 
-//         "Local Time": open.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE), 
-//         "Relative Time": open.toRelative({ unit: [ "hours", "minutes"] })
-//     },
-//     {
-//         "Session": exchanges.nyse.sessions.after.name, 
-//         "Exchange Time": afterOpen.toLocaleString(DateTime.TIME_SIMPLE), 
-//         "Local Time": afterOpen.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE), 
-//         "Relative Time": afterOpen.toRelative({ unit: [ "hours", "minutes"] })
-//     }
-// ]
 
 function generateTableHead(table, data) {
     let thead = table.createTHead();
@@ -176,40 +189,38 @@ function generateTable(table, data) {
         }
     }
 }
+let currentTable = document.getElementById("lseTable");
 
-let table = document.getElementById("testTable");
-let data = Object.keys(tableData[0])
-generateTable(table, tableData);
-generateTableHead(table, data);
+let exchangeData = Object.keys(exchanges);
+for (key of exchangeData) {
+    let exchange = exchanges[key];
+    let exchangeTime = localTime.setZone(exchange.timeZone);
 
 
 
-document.getElementById("table").rows[1].cells.item(1).innerHTML = preOpen.toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[1].cells.item(2).innerHTML = preOpen.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE);
-// document.getElementById("table").rows[1].cells.item(3).innerHTML = preOpen.diff(exchangeTime, 'hours').toFormat('hh:mm:ss');
-document.getElementById("table").rows[1].cells.item(3).innerHTML = preOpen.toRelative({ unit: [ "hours", "minutes"] });
+    
+    let tableData = createTableData(exchange, exchangeTime);
+    
+    let table = document.createElement('table');
+    table.setAttribute("id", exchange.nameShort);
+    document.body.insertBefore(table, currentTable);
+    generateTable(table, tableData);
+    generateTableHead(table, Object.keys(tableData[0]));
+    
+    // let table = document.getElementById("testTable");
+    // let data = Object.keys(tableData[0])
+    // generateTable(table, tableData);
+    // generateTableHead(table, data);
+    // 
+    // let lseExchangeTime = localTime.setZone(exchanges.lse.timeZone);
+    // let lseTableData = createTableData(exchanges.lse, lseExchangeTime);
+    // let lseTable = document.getElementById("lseTable");
+    // let lseData = Object.keys(lseTableData[0])
+    // generateTable(lseTable, lseTableData);
+    // generateTableHead(lseTable, lseData);
+}
 
-document.getElementById("table").rows[2].cells.item(1).innerHTML = preClose.toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[2].cells.item(2).innerHTML = preClose.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[2].cells.item(3).innerHTML = preClose.diff(exchangeTime, 'hours').toFormat('hh:mm:ss');
 
-document.getElementById("table").rows[3].cells.item(1).innerHTML = open.toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[3].cells.item(2).innerHTML = open.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE);
-var openDiff = open.diffNow(['hours', 'minutes']);
-// document.getElementById("table").rows[3].cells.item(3).innerHTML = -openDiff.hours + " hours and " + -Math.floor(openDiff.minutes) + " minutes ago";
-document.getElementById("table").rows[3].cells.item(3).innerHTML = open.toRelative({ unit: [ "hours", "minutes"] });
-
-document.getElementById("table").rows[4].cells.item(1).innerHTML = close.toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[4].cells.item(2).innerHTML = close.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[4].cells.item(3).innerHTML = close.diff(exchangeTime, 'hours').toFormat('hh:mm:ss');
-
-document.getElementById("table").rows[5].cells.item(1).innerHTML = afterOpen.toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[5].cells.item(2).innerHTML = afterOpen.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[5].cells.item(3).innerHTML = afterOpen.diff(exchangeTime, 'hours').toFormat('hh:mm:ss');
-
-document.getElementById("table").rows[6].cells.item(1).innerHTML = afterClose.toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[6].cells.item(2).innerHTML = afterClose.setZone("Australia/Adelaide").toLocaleString(DateTime.TIME_SIMPLE);
-document.getElementById("table").rows[6].cells.item(3).innerHTML = afterClose.diff(exchangeTime, 'hours').toFormat('hh:mm:ss');
 // expected += interval;
 // setTimeout(step, Math.max(0, interval - dt)); // take into account drift
 // }

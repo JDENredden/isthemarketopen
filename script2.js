@@ -21,6 +21,10 @@ var localTime= DateTime.now();
 //     }
 localTimeZone = DateTime.local().zoneName;
 
+function obj(id){
+    return document.getElementById(id);
+}
+
 var exchanges = {
     "nyse" : {
         "nameLong" : "New York Stock Exchange",

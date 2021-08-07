@@ -30,6 +30,7 @@ var exchanges = {
         "nameLong" : "New York Stock Exchange",
         "nameShort" : "NYSE",
         "timeZone" : "America/New_York",
+        "openDays" : [1, 2, 3, 4, 5],
         "sessions" : {
             "pre" : {
                 "name" : "Pre-Market",
@@ -55,6 +56,7 @@ var exchanges = {
         "nameLong" : "London Stock Exchange",
         "nameShort" : "LSE",
         "timeZone" : "Europe/London",
+        "openDays" : [1, 2, 3, 4, 5],
         "sessions" : {
             "pre" : {
                 "name" : "Pre-Trading",
@@ -92,6 +94,7 @@ var exchanges = {
         "nameLong" : "Hong Kong Stock Exchange",
         "nameShort" : "HKEX",
         "timeZone" : "Asia/Hong_Kong",
+        "openDays" : [1, 2, 3, 4, 5],
         "sessions" : {
             "pre" : {
                 "name" : "Pre-Opening",
@@ -122,6 +125,44 @@ var exchanges = {
                 "openHour" : 16,
                 "openMinute" : 0,
                 "duration" : 10
+            }
+        }
+    },
+    "asx" : {
+        "nameLong" : "Australian Stock Exchange",
+        "nameShort" : "ASX",
+        "timeZone" : "Australia/Sydney",
+        "openDays" : [1, 2, 3, 4, 5],
+        "sessions" : {
+            "pre" : {
+                "name" : "Pre-Open",
+                "openHour" : 7,
+                "openMinute" : 0,
+                "duration" : 180
+            },
+            "core" : {
+                "name" : "Normal",
+                "openHour" : 10,
+                "openMinute" : 0,
+                "duration" : 360 
+            },
+            "preAuction" : {
+                "name" : "Pre-Closing Single Price Auction",
+                "openHour" : 16,
+                "openMinute" : 0,
+                "duraton" : 10
+            },
+            "auction" : {
+                "name" : "Closing Single Price Auction",
+                "openHour" : 16,
+                "openMinute" : 10,
+                "duration" : 2
+            },
+            "adjuust" : {
+                "name" : "Adjust",
+                "openHour" : 16,
+                "openMinute" : 12,
+                "duration" : 158
             }
         }
     }
@@ -265,16 +306,52 @@ let currentTable = document.getElementById("lseTable");
 let exchangeData = Object.keys(exchanges);
 let container = document.getElementById("tableContainer");
 
+function isExchangeOpen(exchange) {
+    let exchangeTime = localTime.setZone(exchange.timeZone)
+    // let exchangeTime = exchange.sessions.core;
+    // if (exchange.sessions.includes("lunch"))
+    normalTrading = exchange.sessions.core;
+    
+    let open = exchangeTime.set({ 
+        hour: normalTrading.openHour, 
+        minute: normalTrading.openMinute, 
+        second: 0 
+    });
+    
+    let close = open.plus({ minute: normalTrading.duration });
+    
+    if (exchange.openDays.includes(exchangeTime.weekday)) {
+        if (exchangeTime > open && exchangeTime < close) {
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+
 for (key of exchangeData) {
     let exchange = exchanges[key];
+    let exchangeOpen = isExchangeOpen(exchanges[key]);
     let exchangeTime = localTime.setZone(exchange.timeZone);
+
+    // Check if exchange open and adjust relative times
+    while (!exchangeOpen) {
+        exchangeTime = exchangeTime.plus({ days: 1 })
+        exchangeOpen = isExchangeOpen(exchanges[key]);
+    }
+
+    
+    let li = document.createElement("li");
+    li.setAttribute("id", exchange.nameShort.toLowerCase());
+
     let tableData = createTableData(exchange, exchangeTime);
     let table = document.createElement('table');
     let title = document.createElement("h2");
-    title.innerHTML = exchange.nameLong;
+    title.innerHTML = exchange.nameLong + " open: " + exchangeOpen;
     container.appendChild(title);
-    table.setAttribute("id", exchange.nameShort);
-    container.appendChild(table);
+    table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");
+    li.appendChild(table);
+    container.appendChild(li);
     
     generateTable(table, tableData);
     generateTableHead(table, Object.keys(tableData[0]));

@@ -17,6 +17,10 @@ table {
 	margin-bottom: 2em;
 } */
 
+ul {
+	list-style-type: none;
+}
+
 .core, .core2 {
 	font-weight: bold;
 }

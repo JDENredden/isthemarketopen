@@ -306,47 +306,130 @@ let currentTable = document.getElementById("lseTable");
 let exchangeData = Object.keys(exchanges);
 let container = document.getElementById("tableContainer");
 
-function isExchangeOpen(exchange) {
-    let exchangeTime = localTime.setZone(exchange.timeZone)
-    // let exchangeTime = exchange.sessions.core;
-    // if (exchange.sessions.includes("lunch"))
-    normalTrading = exchange.sessions.core;
-    
-    let open = exchangeTime.set({ 
-        hour: normalTrading.openHour, 
-        minute: normalTrading.openMinute, 
-        second: 0 
-    });
-    
-    let close = open.plus({ minute: normalTrading.duration });
-    
-    if (exchange.openDays.includes(exchangeTime.weekday)) {
-        if (exchangeTime > open && exchangeTime < close) {
-            return true;
-        }
+
+function isThisDayATradingDay(exchange, day) {
+    if (exchange.openDays.includes(day.weekday)) {
+        return true;
     } else {
         return false;
     }
 }
 
+function isExchangeOpen(exchange, day = 0) {
+    if (day == 0) {
+        day = localTime.setZone(exchange.timeZone).plus({ days: 3 });
+    }
+    
+    // let exchangeTime = exchange.sessions.core;
+    // if (exchange.sessions.includes("lunch"))
+    normalTrading = exchange.sessions.core;
+    
+    let open = day.set({ 
+        hour: normalTrading.openHour, 
+        minute: normalTrading.openMinute, 
+        second: 0 
+    });
+    
+    let close = open.plus({ minutes: normalTrading.duration });
+
+    if (isThisDayATradingDay(exchange, day)) {
+        
+        if (day > open && day < close) {
+            return true;
+        } 
+        else {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+    
+// // if (!exchangeTime) {
+//     // console.log("ExchangeTime: " + localTime.setZone(exchange.timeZone).weekday)
+//     exchangeTime = localTime.setZone(exchange.timeZone).plus({ days: days });
+//     // console.log("ExchangeTime + days: " + exchangeTime.weekday)
+//     // console.log("Include " + exchange.openDays.includes(exchangeTime.weekday))
+//     // console.log(exchangeTime);
+// // }
+// 
+// // let exchangeTime = exchange.sessions.core;
+// 
+// 
+// 
+// 
+// // if (exchange.sessions.includes("lunch"))
+// normalTrading = exchange.sessions.core;
+// 
+// let open = exchangeTime.set({ 
+//     hour: normalTrading.openHour, 
+//     minute: normalTrading.openMinute, 
+//     second: 0 
+// });
+// 
+// let close = open.plus({ minutes: normalTrading.duration });
+// 
+// console.log(exchangeTime.diff(open).as('hours'));
+// console.log(exchangeTime.diff(close).as('hours'));
+// 
+// openDiff = exchangeTime.diff(open);
+// closeDiff = exchangeTime.diff(close);
+// 
+// // if (exchangeTime > open && exchangeTime < close) {
+//     if (openDiff >= 0 && closeDiff <=0 ) {
+//         return true;
+//         exit;
+//     } else {
+//         return false;
+//     }
+// } else {
+//     return false;
+// }
+
+}
+
+// for (let days = 0; days < 1; days++) {
+//         exchangeOpen = isExchangeOpen(exchanges.nyse, days);
+//         console.log("do: " + exchangeOpen);
+// 
+//     }
+
+// console.log(isExchangeOpen(exchanges.nyse, 3));
+
+// console.log("1: " + exchangeTime.plus({ days: 1 }).toLocaleString(DateTime.TIME_SIMPLE));
+
 for (key of exchangeData) {
     let exchange = exchanges[key];
-    let exchangeOpen = isExchangeOpen(exchanges[key]);
     let exchangeTime = localTime.setZone(exchange.timeZone);
+    let exchangeOpenOnThisDay = isThisDayATradingDay(exchange, exchangeTime);
+    let exchangeOpen = isExchangeOpen(exchanges[key], exchangeTime);
+
 
     // Check if exchange open and adjust relative times
-    while (!exchangeOpen) {
-        exchangeTime = exchangeTime.plus({ days: 1 })
-        exchangeOpen = isExchangeOpen(exchanges[key]);
+    // days = 0;
+    do {
+        console.log("do: " + exchangeOpen);
+        exchangeOpenOnThisDay = isThisDayATradingDay(exchanges[key], exchangeTime);
+        exchangeTime = exchangeTime.plus({ days: 1 });
     }
+    while (!exchangeOpenOnThisDay);
+    
+    // days = 0;
+    // for (let days = 0; days < 5; days++) {
+    //     console.log("do: " + exchangeOpen);
+    //     exchangeOpen = isExchangeOpen(exchanges[key], days);
+    // }
 
     
     let li = document.createElement("li");
     li.setAttribute("id", exchange.nameShort.toLowerCase());
 
     let tableData = createTableData(exchange, exchangeTime);
+    console.log(tableData);
     let table = document.createElement('table');
     let title = document.createElement("h2");
+    let subHead = document.createElement("h3");
+    // subHead.innerHTML = "The " + exchange.nameShort + " is open for regular trading " + tableData. + " "
     title.innerHTML = exchange.nameLong + " open: " + exchangeOpen;
     container.appendChild(title);
     table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");

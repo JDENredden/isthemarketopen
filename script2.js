@@ -183,10 +183,24 @@ document.getElementById("localCoreClose").innerHTML = close.setZone("Australia/A
 document.getElementById("localCity").innerHTML = localTime.zoneName.split("/")[1];
 document.getElementById("exchangeCity").innerHTML = exchangeTime.zoneName.split("/")[1];
 
+const buildAcronym = (str = '') => {
+    const strArr = str.split(' ');
+    let res = '';
+    strArr.forEach(el => {
+        const [char] = el;
+        if (char === char.toUpperCase() && char !== char.toLowerCase()) {
+            res += char;
+        };
+    });
+    return res;
+};
+
 function createTableData(exchange, exchangeTime) {
     let tableData = [];
     // numberOfSessions = Object.keys(exchange.sessions).length;
     let data = Object.keys(exchange.sessions);
+    // let formatting = DateTime.TIME_24_SIMPLE;
+    let formatting = "hh':'mm' 'a";
     
     for (key of data) {
         let sessionData = {};
@@ -198,9 +212,14 @@ function createTableData(exchange, exchangeTime) {
         });
         let sessionClose = sessionOpen.plus({ minute: session.duration });
         
+        sessionData["className"] = key;
         sessionData["Session"] = session.name;
-        sessionData["Exchange Time"] = sessionOpen.toLocaleString(DateTime.TIME_SIMPLE) + " - " + sessionClose.toLocaleString(DateTime.TIME_SIMPLE);
-        sessionData["Local Time"] = sessionOpen.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + " - " + sessionClose.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE);
+        // sessionData["Exchange Time"] = sessionOpen.toFormat(formatting).replace(/^0+/, '\xa0') + " - " + sessionClose.toFormat(formatting).replace(/^0+/, '\xa0');
+        // sessionData["Local Time"] = sessionOpen.setZone(localTimeZone).toFormat(formatting).replace(/^0+/, '\xa0') + " - " + sessionClose.setZone(localTimeZone).toFormat(formatting).replace(/^0+/, '\xa0');
+        sessionData["Exchange Time (" + buildAcronym(sessionOpen.toFormat("ZZZZZ")) + ")"] = sessionOpen.toFormat(formatting).toLowerCase() + " - " + sessionClose.toFormat(formatting).toLowerCase();
+        sessionData["Local Time (" + buildAcronym(localTime.toFormat("ZZZZZ")) + ")"] = sessionOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
+        // sessionData["Exchange Time"] = "<span>" + sessionOpen.toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
+        // sessionData["Local Time"] = "<span>" + sessionOpen.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
         sessionData["Relative Open"] = sessionOpen.toRelative({ unit: [ "hours", "minutes"] });
         sessionData["Relative Close"] = sessionClose.toRelative();
         
@@ -213,6 +232,9 @@ function generateTableHead(table, data) {
     let thead = table.createTHead();
     let row = thead.insertRow();
     for (let key of data) {
+        if (key == "className") {
+            continue;
+        }
         let th = document.createElement("th");
         let text = document.createTextNode(key);
         th.appendChild(text);
@@ -223,8 +245,16 @@ function generateTableHead(table, data) {
 function generateTable(table, data) {
     for (let element of data) {
         let row = table.insertRow();
+        row.setAttribute("class", element.className);
         for (key in element) {
+            if (key == "className") {
+                continue;
+            }
             let cell = row.insertCell();
+            
+            if (key.includes("Time")) {
+                cell.setAttribute("class", "time");   
+            }
             let text = document.createTextNode(element[key]);
             cell.appendChild(text);
         }
@@ -240,6 +270,9 @@ for (key of exchangeData) {
     let exchangeTime = localTime.setZone(exchange.timeZone);
     let tableData = createTableData(exchange, exchangeTime);
     let table = document.createElement('table');
+    let title = document.createElement("h2");
+    title.innerHTML = exchange.nameLong;
+    container.appendChild(title);
     table.setAttribute("id", exchange.nameShort);
     container.appendChild(table);
     

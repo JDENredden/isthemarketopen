@@ -536,14 +536,14 @@ for (key of exchangeData) {
     // Check if exchange open and adjust relative times
     // days = 0;
     daysTilNextOpen = 0;
-    do {
+    while(!exchangeOpenOnThisDay) {
         console.log("do: " + exchangeOpen);
         exchangeOpenOnThisDay = isThisDayATradingDay(exchanges[key], exchangeTimeNextOpen);
         exchangeTimeNextOpen = exchangeTime.plus({ days: daysTilNextOpen });
         daysTilNextOpen++;
     }
-    while (!exchangeOpenOnThisDay);
-    daysTilNextOpen--;
+    
+    console.log(daysTilNextOpen);
     
     // days = 0;
     // for (let days = 0; days < 5; days++) {

@@ -1,3 +1,5 @@
+
+
 let DateTime = luxon.DateTime;
 
 // var start = DateTime.now();
@@ -165,6 +167,82 @@ var exchanges = {
                 "duration" : 158
             }
         }
+    },
+    "hkse2" : {
+        "nameLong" : "Hong Kong Stock Exchange",
+        "nameShort" : "HKEX",
+        "timeZone" : "Asia/Hong_Kong",
+        "openDays" : [1, 2, 3, 4, 5],
+        "sessions" : {
+            "pre" : {
+                "name" : "Pre-Opening",
+                "openHour" : 9,
+                "openMinute" : 0,
+                "duration" : 30
+            },
+            "core" : {
+                "name" : "Morning",
+                "openHour" : 9,
+                "openMinute" : 30,
+                "duration" : 150 
+            },
+            "lunch" : {
+                "name" : "Lunch",
+                "openHour" : 12,
+                "openMinute" : 0,
+                "duration" : 60
+            },
+            "core2" : {
+                "name" : "Afternoon",
+                "openHour" : 13,
+                "openMinute" : 0,
+                "duration" : 180,
+            },
+            "after" : {
+                "name" : "Closing Auction",
+                "openHour" : 16,
+                "openMinute" : 0,
+                "duration" : 10
+            }
+        }
+    },
+    "asx2" : {
+        "nameLong" : "Australian Stock Exchange",
+        "nameShort" : "ASX",
+        "timeZone" : "Australia/Sydney",
+        "openDays" : [1, 2, 3, 4, 5],
+        "sessions" : {
+            "pre" : {
+                "name" : "Pre-Open",
+                "openHour" : 7,
+                "openMinute" : 0,
+                "duration" : 180
+            },
+            "core" : {
+                "name" : "Normal",
+                "openHour" : 10,
+                "openMinute" : 0,
+                "duration" : 360 
+            },
+            "preAuction" : {
+                "name" : "Pre-Closing Single Price Auction",
+                "openHour" : 16,
+                "openMinute" : 0,
+                "duraton" : 10
+            },
+            "auction" : {
+                "name" : "Closing Single Price Auction",
+                "openHour" : 16,
+                "openMinute" : 10,
+                "duration" : 2
+            },
+            "adjuust" : {
+                "name" : "Adjust",
+                "openHour" : 16,
+                "openMinute" : 12,
+                "duration" : 158
+            }
+        }
     }
 }
 
@@ -236,7 +314,7 @@ const buildAcronym = (str = '') => {
     return res;
 };
 
-function createTableData(exchange, exchangeTime) {
+function createTableData(exchange, exchangeTime, daysTilNextOpen) {
     let tableData = [];
     // numberOfSessions = Object.keys(exchange.sessions).length;
     let data = Object.keys(exchange.sessions);
@@ -261,8 +339,8 @@ function createTableData(exchange, exchangeTime) {
         sessionData["Local Time (" + buildAcronym(localTime.toFormat("ZZZZZ")) + ")"] = sessionOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
         // sessionData["Exchange Time"] = "<span>" + sessionOpen.toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
         // sessionData["Local Time"] = "<span>" + sessionOpen.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
-        sessionData["Relative Open"] = sessionOpen.toRelative({ unit: [ "hours", "minutes"] });
-        sessionData["Relative Close"] = sessionClose.toRelative();
+        sessionData["Relative Open"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
+        // sessionData["Relative Close"] = sessionClose.toRelative( { unit: ["hours", "minutes"]});
         
         tableData.push(sessionData);
     }
@@ -317,7 +395,7 @@ function isThisDayATradingDay(exchange, day) {
 
 function isExchangeOpen(exchange, day = 0) {
     if (day == 0) {
-        day = localTime.setZone(exchange.timeZone).plus({ days: 3 });
+        day = localTime.setZone(exchange.timeZone);
     }
     
     // let exchangeTime = exchange.sessions.core;
@@ -398,43 +476,85 @@ function isExchangeOpen(exchange, day = 0) {
 
 // console.log("1: " + exchangeTime.plus({ days: 1 }).toLocaleString(DateTime.TIME_SIMPLE));
 
+function generateListElement(exchange, exchangeTime, tableData) {
+    let formatting = "hh':'mm' 'a"
+    let exchangeOpen = isExchangeOpen(exchange, exchangeTime);
+    
+    switch (exchangeOpen) {
+        case true:
+            exchangeOpenString = "open";
+            break;
+        case false:
+            exchangeOpenString = "closed";
+    }
+
+    
+    let coreOpen = exchangeTime.set({ 
+        hour: exchange.sessions.core.openHour, 
+        minute: exchange.sessions.core.openMinute, 
+        second: 0 
+    });
+    let coreClose = coreOpen.plus({ minute: exchange.sessions.core.duration });
+    
+    let coreOpenString = coreOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + coreClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
+
+    
+    let li = document.createElement("li");
+    li.setAttribute("id", exchange.nameShort.toLowerCase());
+    
+    let table = document.createElement('table');
+    let title = document.createElement("h2");
+    let subHead = document.createElement("h3");
+    title.innerHTML = exchange.nameLong;
+    subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for regular trading." + exchangeTime.toLocaleString() + " weekday: " + exchangeTime.weekday;
+    // Regualr trading is " + coreOpenString + ", Monday - Friday.";
+    li.appendChild(title);
+    li.appendChild(subHead);
+    table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");
+    if (exchangeOpen) {
+        table.setAttribute("class", "open");
+    }
+    else {
+        table.setAttribute("class", "closed");
+    }
+    
+    li.appendChild(table);
+    container.appendChild(li);
+    
+    return table
+}
+
 for (key of exchangeData) {
     let exchange = exchanges[key];
+    // let exchangeTime = localTime.setZone(exchange.timeZone).plus({ hours: 0 });
     let exchangeTime = localTime.setZone(exchange.timeZone);
+
     let exchangeOpenOnThisDay = isThisDayATradingDay(exchange, exchangeTime);
     let exchangeOpen = isExchangeOpen(exchanges[key], exchangeTime);
 
-
+    let exchangeTimeNextOpen = exchangeTime;
     // Check if exchange open and adjust relative times
     // days = 0;
+    daysTilNextOpen = 0;
     do {
         console.log("do: " + exchangeOpen);
-        exchangeOpenOnThisDay = isThisDayATradingDay(exchanges[key], exchangeTime);
-        exchangeTime = exchangeTime.plus({ days: 1 });
+        exchangeOpenOnThisDay = isThisDayATradingDay(exchanges[key], exchangeTimeNextOpen);
+        exchangeTimeNextOpen = exchangeTime.plus({ days: daysTilNextOpen });
+        daysTilNextOpen++;
     }
     while (!exchangeOpenOnThisDay);
+    daysTilNextOpen--;
     
     // days = 0;
     // for (let days = 0; days < 5; days++) {
     //     console.log("do: " + exchangeOpen);
     //     exchangeOpen = isExchangeOpen(exchanges[key], days);
     // }
+    
+    let tableData = createTableData(exchange, exchangeTime, daysTilNextOpen);
 
     
-    let li = document.createElement("li");
-    li.setAttribute("id", exchange.nameShort.toLowerCase());
-
-    let tableData = createTableData(exchange, exchangeTime);
-    console.log(tableData);
-    let table = document.createElement('table');
-    let title = document.createElement("h2");
-    let subHead = document.createElement("h3");
-    // subHead.innerHTML = "The " + exchange.nameShort + " is open for regular trading " + tableData. + " "
-    title.innerHTML = exchange.nameLong + " open: " + exchangeOpen;
-    container.appendChild(title);
-    table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");
-    li.appendChild(table);
-    container.appendChild(li);
+    table = generateListElement(exchange, exchangeTime, tableData);
     
     generateTable(table, tableData);
     generateTableHead(table, Object.keys(tableData[0]));
@@ -456,3 +576,45 @@ for (key of exchangeData) {
 // expected += interval;
 // setTimeout(step, Math.max(0, interval - dt)); // take into account drift
 // }
+
+let grids = [...document.querySelectorAll('.masonry')];
+
+if(grids.length && getComputedStyle(grids[0]).gridTemplateRows !== 'masonry') {
+    grids = grids.map(grid => ({
+        _el: grid, 
+        gap: parseFloat(getComputedStyle(grid).gridRowGap), 
+        items: [...grid.childNodes].filter(c => c.nodeType === 1), 
+        ncol: 0
+    }));
+
+    function layout() {
+        grids.forEach(grid => {
+            /* get the post relayout number of columns */
+            let ncol = getComputedStyle(grid._el).gridTemplateColumns.split(' ').length;
+
+            /* if the number of columns has changed */
+            if(grid.ncol !== ncol) {
+                /* update number of columns */
+                grid.ncol = ncol;
+
+                /* revert to initial positioning, no margin */
+                grid.items.forEach(c => c.style.removeProperty('margin-top'));
+
+                /* if we have more than one column */
+                if(grid.ncol > 1) {
+                    grid.items.slice(ncol).forEach((c, i) => {
+                        let prev_fin = grid.items[i].getBoundingClientRect().bottom /* bottom edge of item above */, 
+                                curr_ini = c.getBoundingClientRect().top /* top edge of current item */;
+                        
+                        c.style.marginTop = `${prev_fin + grid.gap - curr_ini}px`
+                    })
+                }
+            }
+        })
+    }
+
+    addEventListener('load', e => {
+        layout(); /* initial load */
+        addEventListener('resize', layout, false) /* on resize */
+    }, false);
+}

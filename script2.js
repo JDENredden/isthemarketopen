@@ -58,6 +58,7 @@ var exchanges = {
         "nameLong" : "London Stock Exchange",
         "nameShort" : "LSE",
         "timeZone" : "Europe/London",
+        "emoji" : ":flag-gb:",
         "openDays" : [1, 2, 3, 4, 5],
         "sessions" : {
             "pre" : {
@@ -252,7 +253,7 @@ console.log(Object.keys(exchanges.nyse.sessions).length);
 console.log(exchanges.nyse.sessions.pre.openHour);
 console.log(exchanges.nyse.sessions[1]);
 
-localTime = localTime.plus({seconds: 1});
+localTime = DateTime.now();
 
 let exchangeTime = localTime.setZone(exchanges.nyse.timeZone);
 let preSessionDuration = exchanges.nyse.sessions.pre.duration; //minutes
@@ -398,30 +399,41 @@ function isExchangeOpen(exchange, day = 0) {
         day = localTime.setZone(exchange.timeZone);
     }
     
+    var isOpen;
+    
     // let exchangeTime = exchange.sessions.core;
     // if (exchange.sessions.includes("lunch"))
-    normalTrading = exchange.sessions.core;
+    normalTrading = ["core", "core2"]; 
     
-    let open = day.set({ 
-        hour: normalTrading.openHour, 
-        minute: normalTrading.openMinute, 
-        second: 0 
-    });
-    
-    let close = open.plus({ minutes: normalTrading.duration });
-
-    if (isThisDayATradingDay(exchange, day)) {
+    for (session of normalTrading) {
+        normalTrading = exchange.sessions[session];
+        if (normalTrading == undefined) {
+            break;
+        }
         
-        if (day > open && day < close) {
-            return true;
-        } 
+        let open = day.set({ 
+            hour: normalTrading.openHour, 
+            minute: normalTrading.openMinute, 
+            second: 0 
+        });
+        
+        let close = open.plus({ minutes: normalTrading.duration });
+    
+        if (isThisDayATradingDay(exchange, day)) {
+            
+            if (day > open && day < close) {
+                isOpen = true;
+            } 
+            else {
+                isOpen = false;
+            }
+        }
         else {
-            return false;
+            isOpen = false;
         }
     }
-    else {
-        return false;
-    }
+    return isOpen
+}
     
 // // if (!exchangeTime) {
 //     // console.log("ExchangeTime: " + localTime.setZone(exchange.timeZone).weekday)
@@ -464,7 +476,6 @@ function isExchangeOpen(exchange, day = 0) {
 //     return false;
 // }
 
-}
 
 // for (let days = 0; days < 1; days++) {
 //         exchangeOpen = isExchangeOpen(exchanges.nyse, days);
@@ -475,6 +486,37 @@ function isExchangeOpen(exchange, day = 0) {
 // console.log(isExchangeOpen(exchanges.nyse, 3));
 
 // console.log("1: " + exchangeTime.plus({ days: 1 }).toLocaleString(DateTime.TIME_SIMPLE));
+
+function whatSessionIsOpen(exchange, day) {
+    
+    sessions = Object.keys(exchange.sessions);
+    
+    for (key of sessions) {
+        let session = exchange.sessions[key];
+        
+        let open = day.set({ 
+            hour: session.openHour, 
+            minute: session.openMinute, 
+            second: 0 
+        });
+        
+        let close = open.plus({ minutes: session.duration });
+    
+        if (isThisDayATradingDay(exchange, day)) {
+            
+            if (day > open && day < close) {
+                return session;
+            } 
+            else {
+                continue;
+            }
+        }
+        else {
+            continue;
+        }
+    }
+    return false;
+}
 
 function generateListElement(exchange, exchangeTime, tableData) {
     let formatting = "hh':'mm' 'a"
@@ -497,29 +539,51 @@ function generateListElement(exchange, exchangeTime, tableData) {
     let coreClose = coreOpen.plus({ minute: exchange.sessions.core.duration });
     
     let coreOpenString = coreOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + coreClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
+    
+    let openSession = whatSessionIsOpen(exchange, exchangeTime);
 
     
     let li = document.createElement("li");
     li.setAttribute("id", exchange.nameShort.toLowerCase());
+    li.setAttribute("class", "exchange-item");
     
     let table = document.createElement('table');
     let title = document.createElement("h2");
     let subHead = document.createElement("h3");
-    title.innerHTML = exchange.nameLong;
-    subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for regular trading." + exchangeTime.toLocaleString() + " weekday: " + exchangeTime.weekday;
+    let timeTag = document.createElement("time");
+    timeTag.innerHTML = exchangeTime.toFormat("cccc, L LLLL y");
+    // timeTag.innerHTML = exchangeTime.toFormat("ffff");
+    title.innerHTML = exchange.nameLong + " open session: " + openSession.name;
+    subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for regular trading. " + exchangeTime.toLocaleString(DateTime.TIME_SIMPLE) + " weekday: " + exchangeTime.weekday;
     // Regualr trading is " + coreOpenString + ", Monday - Friday.";
     li.appendChild(title);
+    li.appendChild(timeTag);
     li.appendChild(subHead);
     table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");
     if (exchangeOpen) {
         table.setAttribute("class", "open");
+        li.classList.add("open");
     }
     else {
         table.setAttribute("class", "closed");
+        li.classList.add("closed");
     }
     
     li.appendChild(table);
-    container.appendChild(li);
+    // container.appendChild(li);
+    
+    if (exchangeOpen) {
+        container.insertBefore(li, container.firstChild);
+    } else {
+        container.appendChild(li);
+    }
+    
+    
+    // pivot.init({
+    //     selector: "#" + exchange.nameShort.toLowerCase(),
+    //     invert: true,
+    //     shine: true
+    // });
     
     return table
 }
@@ -535,15 +599,34 @@ for (key of exchangeData) {
     let exchangeTimeNextOpen = exchangeTime;
     // Check if exchange open and adjust relative times
     // days = 0;
-    daysTilNextOpen = 0;
-    while(!exchangeOpenOnThisDay) {
-        console.log("do: " + exchangeOpen);
-        exchangeOpenOnThisDay = isThisDayATradingDay(exchanges[key], exchangeTimeNextOpen);
-        exchangeTimeNextOpen = exchangeTime.plus({ days: daysTilNextOpen });
-        daysTilNextOpen++;
-    }
     
-    console.log(daysTilNextOpen);
+    // let daysTilNextOpen = 0;
+    // while(!exchangeOpenOnThisDay) {
+    //     ++daysTilNextOpen;
+    //     // console.log("do: " + exchangeOpen);
+    //     exchangeOpenOnThisDay = isThisDayATradingDay(exchanges[key], exchangeTimeNextOpen);
+    //     if (exchangeOpenOnThisDay) {
+    //         break;
+    //     }
+    //     exchangeTimeNextOpen = exchangeTimeNextOpen.plus({ days: daysTilNextOpen });
+    //     console.log(exchangeTimeNextOpen.weekday);
+    //     console.log(exchangeOpenOnThisDay);
+    // }
+    
+    let daysTilNextOpen = 0;
+    for (var i=0; i < 7; i++) {
+        if (!exchangeOpenOnThisDay) {
+            daysTilNextOpen++;
+            exchangeOpenOnThisDay = isThisDayATradingDay(exchange, exchangeTime.plus({ days: daysTilNextOpen }))
+            if (exchangeOpenOnThisDay) {
+                break;
+            }
+        }
+    }
+
+    
+    
+    // console.log(daysTilNextOpen);
     
     // days = 0;
     // for (let days = 0; days < 5; days++) {
@@ -559,6 +642,7 @@ for (key of exchangeData) {
     generateTable(table, tableData);
     generateTableHead(table, Object.keys(tableData[0]));
     
+    
     // let table = document.getElementById("testTable");
     // let data = Object.keys(tableData[0])
     // generateTable(table, tableData);
@@ -571,6 +655,14 @@ for (key of exchangeData) {
     // generateTable(lseTable, lseTableData);
     // generateTableHead(lseTable, lseData);
 }
+
+// Rearrange so open exhanges are up the top
+// table = document.getElementById("tableContainer");
+// listItems = table.querySelectorAll("li.open");
+// 
+// for (var i=0; i < listItems.length; i++) {
+//     table.insertBefore(listItems[i], table.firstChild);
+// }
 
 
 // expected += interval;
@@ -618,3 +710,11 @@ if(grids.length && getComputedStyle(grids[0]).gridTemplateRows !== 'masonry') {
         addEventListener('resize', layout, false) /* on resize */
     }, false);
 }
+
+// layout();
+
+// pivot.init({
+//     selector: "#nyse"
+//     invert: true,
+//     shine: true
+// });

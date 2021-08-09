@@ -39,7 +39,7 @@ ul li {
 
 ul {
 	list-style-type: none;
-	padding: 0;
+	padding: 0 2em;
 	/* display: block; */
 	/* display: flex;
 	flex-wrap: wrap;
@@ -56,10 +56,12 @@ ul {
 	
 	display: grid;
 	grid-gap: 2em;
-	grid-template-columns: repeat( auto-fill, minmax( 50em, 1fr ) ); 
+	grid-template-columns: repeat( auto-fill, minmax( 30em, 1fr ) ); 
+	/* grid-template-columns: 3; */
 	grid-template-rows: masonry;
+	/* width: 100%; */
 	/* vertical-align: top; */
-	
+	/* margin: 0 auto; */
 	
 	/* column-count: 2;
 	column-gap: 1em;
@@ -70,23 +72,44 @@ ul {
 	font-weight: bold;
 	}
 	
-	ul li {
-	background: #e53935;
-	background: -webkit-linear-gradient(to bottom, #e35d5b, #e53935);  
-	background: linear-gradient(to bottom, #e35d5b, #e53935); 
-	background-clip: padding-box; 
+ul li {
 	border-radius: 2em;
-	padding: 2em;
+	padding: 1em 2em;
 	/* margin: 1em; */
 	/* display: block; */
 	/* display: flex; */
 	height: min-content;
 	display: inline-block;
 	/* width: 100%; */
-	margin: 0 0 1em;
+	/* margin: 0 0 1em; */
 	/* width: 100%; */
 	/* vertical-align: top; */
-	}
+	color: white;
+	/* margin: 0 auto; */
+	/* width: max-content; */
+	/* min-width: 40em; */
+	/* width: max-content; */
+	/* max-width: 40em; */
+	box-shadow: 0 0.5em 2em rgba(30, 30, 30, 0.3);
+	transition: all 0.15s ease-in-out;
+}
+
+ul li:hover {
+	transform: scale(1.025);
+}
+
+ul li.closed {
+	background: #e53935;
+	background: -webkit-linear-gradient(to bottom, #e35d5b, #e53935);  
+	background: linear-gradient(to bottom, #e35d5b, #e53935); 
+	background-clip: padding-box; 
+}
+
+ul li.open {
+	background: #76b852;  /* fallback for old browsers */
+	background: -webkit-linear-gradient(to bottom, #8DC26F, #76b852);  /* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to bottom, #8DC26F, #76b852);
+}
 
 table .time {
 	text-align: center;
@@ -165,7 +188,7 @@ table td, table th{
 }
 
 table .time {
-	min-width: 13em;
+	min-width: 12em;
 }
 
 table th {

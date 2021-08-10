@@ -36,7 +36,7 @@ var exchanges = {
         "openDays" : [1, 2, 3, 4, 5],
         "sessions" : {
             "pre" : {
-                "name" : "Pre-Market",
+                "name" : "Pre-Trading",
                 "openHour" : 6,
                 "openMinute" : 30,
                 "duration" : 180
@@ -48,7 +48,7 @@ var exchanges = {
                 "duration" : 390 
             },
             "after" : {
-                "name" : "After-Market",
+                "name" : "Extended Hours",
                 "openHour" : 16,
                 "openMinute" : 0,
                 "duration" : 240 
@@ -170,79 +170,69 @@ var exchanges = {
             }
         }
     },
-    "hkse2" : {
-        "nameLong" : "Hong Kong Stock Exchange",
-        "nameShort" : "HKEX",
-        "timeZone" : "Asia/Hong_Kong",
+    "jse" : {
+        "nameLong" : "Tokyo Stock Exchange",
+        "nameShort" : "JPX",
+        "timeZone" : "Asia/Tokyo",
         "openDays" : [1, 2, 3, 4, 5],
         "sessions" : {
-            "pre" : {
-                "name" : "Pre-Opening",
-                "openHour" : 9,
-                "openMinute" : 0,
-                "duration" : 30
-            },
             "core" : {
                 "name" : "Morning",
                 "openHour" : 9,
-                "openMinute" : 30,
+                "openMinute" : 0,
                 "duration" : 150 
             },
             "lunch" : {
                 "name" : "Lunch",
-                "openHour" : 12,
-                "openMinute" : 0,
+                "openHour" : 11,
+                "openMinute" : 30,
                 "duration" : 60
             },
             "core2" : {
                 "name" : "Afternoon",
-                "openHour" : 13,
-                "openMinute" : 0,
-                "duration" : 180,
-            },
-            "after" : {
-                "name" : "Closing Auction",
-                "openHour" : 16,
-                "openMinute" : 0,
-                "duration" : 10
+                "openHour" : 12,
+                "openMinute" : 30,
+                "duration" : 150
             }
         }
     },
-    "asx2" : {
-        "nameLong" : "Australian Stock Exchange",
-        "nameShort" : "ASX",
-        "timeZone" : "Australia/Sydney",
+    "tsx" : {
+        "nameLong" : "Toronto Stock Exchange",
+        "nameShort" : "TSX",
+        "timeZone" : "America/Toronto",
         "openDays" : [1, 2, 3, 4, 5],
         "sessions" : {
-            "pre" : {
-                "name" : "Pre-Open",
-                "openHour" : 7,
-                "openMinute" : 0,
-                "duration" : 180
-            },
             "core" : {
-                "name" : "Normal",
-                "openHour" : 10,
+                "name" : "Continuous Trading",
+                "openHour" : 9,
+                "openMinute" : 30,
+                "duration" : 390 
+            },
+            "after" : {
+                "name" : "Extended Hours",
+                "openHour" : 16,
+                "openMinute" : 15,
+                "duraton" : 45
+            }
+        }
+    },
+    "psx" : {
+        "nameLong" : "Paris Stock Exchange",
+        "nameShort" : "PSX",
+        "timeZone" : "Europe/Paris",
+        "openDays" : [1, 2, 3, 4, 5],
+        "sessions" : {
+            "core" : {
+                "name" : "Trading Session",
+                "openHour" : 9,
                 "openMinute" : 0,
-                "duration" : 360 
+                "duration" : 510 
             },
-            "preAuction" : {
-                "name" : "Pre-Closing Single Price Auction",
-                "openHour" : 16,
-                "openMinute" : 0,
-                "duraton" : 10
-            },
-            "auction" : {
-                "name" : "Closing Single Price Auction",
-                "openHour" : 16,
-                "openMinute" : 10,
-                "duration" : 2
-            },
-            "adjuust" : {
-                "name" : "Adjust",
-                "openHour" : 16,
-                "openMinute" : 12,
-                "duration" : 158
+            "after" : {
+                "name" : "Trading at Last",
+                "openHour" : 17,
+                "openMinute" : 35,
+                "duraton" : 5
             }
         }
     }
@@ -424,6 +414,7 @@ function isExchangeOpen(exchange, day = 0) {
             
             if (day > open && day < close) {
                 isOpen = true;
+                break;
             } 
             else {
                 isOpen = false;
@@ -492,6 +483,8 @@ function whatSessionIsOpen(exchange, day) {
     
     sessions = Object.keys(exchange.sessions);
     
+    
+    
     for (key of sessions) {
         let session = exchange.sessions[key];
         
@@ -516,7 +509,10 @@ function whatSessionIsOpen(exchange, day) {
             continue;
         }
     }
-    return false;
+    let session = { 
+        "name" : "Closed"
+        };
+    return session;
 }
 
 function generateListElement(exchange, exchangeTime, tableData) {
@@ -542,8 +538,7 @@ function generateListElement(exchange, exchangeTime, tableData) {
     let coreOpenString = coreOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + coreClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
     
     let openSession = whatSessionIsOpen(exchange, exchangeTime);
-
-    
+        
     let li = document.createElement("li");
     li.setAttribute("id", exchange.nameShort.toLowerCase());
     li.setAttribute("class", "exchange-item");
@@ -561,19 +556,20 @@ function generateListElement(exchange, exchangeTime, tableData) {
     li.appendChild(timeTag);
     li.appendChild(subHead);
     table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");
+    li.classList.add(openSession.name.replace(/\s+/g, '-').toLowerCase());
+    table.classList.add(openSession.name.replace(/\s+/g, '-').toLowerCase());
+    console.log(exchangeOpen);
     if (exchangeOpen) {
-        table.setAttribute("class", "open");
+        table.classList.add("open");
         li.classList.add("open");
-    }
-    else {
-        table.setAttribute("class", "closed");
-        li.classList.add("closed");
     }
     
     li.appendChild(table);
     // container.appendChild(li);
     
     if (exchangeOpen) {
+        container.insertBefore(li, container.firstChild);
+    } else if (openSession.name != "Closed") { // Any session that is not Core open or closed session
         container.insertBefore(li, container.firstChild);
     } else {
         container.appendChild(li);

@@ -55,6 +55,32 @@ var exchanges = {
             }
         }
     },
+    "nasdaq" : {
+        "nameLong" : "Nasdaq Stock Exchange",
+        "nameShort" : "Nasdaq",
+        "timeZone" : "America/New_York",
+        "openDays" : [1, 2, 3, 4, 5],
+        "sessions" : {
+            "pre" : {
+                "name" : "Opening",
+                "openHour" : 4,
+                "openMinute" : 30,
+                "duration" : 270
+            },
+            "core" : {
+                "name" : "Core",
+                "openHour" : 9,
+                "openMinute" : 30,
+                "duration" : 390 
+            },
+            "after" : {
+                "name" : "Extended Hours",
+                "openHour" : 16,
+                "openMinute" : 0,
+                "duration" : 240 
+            }
+        }
+    },
     "lse" : {
         "nameLong" : "London Stock Exchange",
         "nameShort" : "LSE",
@@ -282,6 +308,62 @@ var exchanges = {
                 "duration" : 1440 
             }
         }
+    },
+    "lme" : {
+        "nameLong" : "London Metal Exchange",
+        "nameShort" : "LME",
+        "timeZone" : "Europe/London",
+        "openDays" : [1, 2, 3, 4, 5],
+        "sessions" : {
+            "core" : {
+                "name" : "LMEselect",
+                "openHour" : 13,
+                "openMinute" : 0,
+                "duration" : 240 
+            },
+            "core2" : {
+                "name" : "LMEprecious",
+                "openHour" : 13,
+                "openMinute" : 0,
+                "duration" : 420
+            },
+            "ring" : {
+                "name" : "1st Ring",
+                "openHour" : 11,
+                "openMinute" : 40,
+                "duration" : 45
+            },
+            "ring2" : {
+                "name" : "2nd Ring (Officials)",
+                "openHour" : 12,
+                "openMinute" : 30,
+                "duration" : 45
+            },
+            "kerb" : {
+                "name" : "Kerb Trading",
+                "openHour" : 13,
+                "openMinute" : 25,
+                "duration" : 80
+            },
+            "ring3" : {
+                "name" : "3rd Ring",
+                "openHour" : 14,
+                "openMinute" : 55,
+                "duration" : 40
+            },
+            "ring4" : {
+                "name" : "4th Ring (Unofficials)",
+                "openHour" : 15,
+                "openMinute" : 40,
+                "duration" : 35
+            },
+            "kerb2" : {
+                "name" : "Kerb Trading",
+                "openHour" : 16,
+                "openMinute" : 15,
+                "duration" : 45
+            }
+        }
     }
 }
 
@@ -415,9 +497,9 @@ function createTableData(exchange, exchangeTime, daysTilNextOpen) {
         // sessionData["Exchange Time"] = "<span>" + sessionOpen.toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
         // sessionData["Local Time"] = "<span>" + sessionOpen.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
         if (openSession == session) {
-            sessionData["When"] = "Now";
+            sessionData["Countdown"] = "Now";
         } else {
-            sessionData["When"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
+            sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
         }
         
         // sessionData["Relative Close"] = sessionClose.toRelative( { unit: ["hours", "minutes"]});
@@ -628,28 +710,70 @@ function generateListElement(exchange, exchangeTime, tableData) {
     let coreOpenString = coreOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + coreClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
     
     let openSession = whatSessionIsOpen(exchange, exchangeTime);
-        
+    let openDays = [exchange.openDays[0], exchange.openDays[exchange.openDays.length - 1]];
+    var openDaysString = [];
+    for (var i=0; i<2; i++) {
+        switch (openDays[i]) {
+            case 1:
+                openDaysString[i] = "Monday";
+                break;
+            case 2:
+                openDaysString[i] = "Tuesday";
+                break;
+            case 3:
+            openDaysString[i] = "Wednesday";
+            break;
+            case 4:
+            openDaysString[i] = "Thursday";
+            break;
+            case 5:
+            openDaysString[i] = "Friday";
+            break;
+            case 6:
+            openDaysString[i] = "Saturday";
+            break;
+            case 7:
+            openDaysString[i] = "Sunday";
+            break;
+        }
+    }
+            
     let li = document.createElement("li");
     li.setAttribute("id", exchange.nameShort.toLowerCase());
     li.setAttribute("class", "exchange-item");
     
     let table = document.createElement('table');
-    let title = document.createElement("h2");
+    let title = document.createElement("h1");
     let subHead = document.createElement("h3");
     let timeTag = document.createElement("time");
+    let text = document.createElement("p");
     
     let referral = document.createElement("p");
     const localCountry = ct.getCountryForTimezone(localTime.zoneName);
     referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks from " + localCountry.name;
     
     timeTag.innerHTML = exchangeTime.toFormat("cccc, L LLLL y");
-    // timeTag.innerHTML = exchangeTime.toFormat("ffff");
-    title.innerHTML = exchange.nameLong + " open session: " + openSession.name;
-    subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for regular trading. " + exchangeTime.toLocaleString(DateTime.TIME_SIMPLE) + " weekday: " + exchangeTime.weekday;
+    title.innerHTML = exchange.nameLong;
+    subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for trading.";
+    text.innerHTML = "Trading week: " + openDaysString[0] + " - " + openDaysString[1];
+    
+    let subHead2 = document.createElement("p");
+    
+    if (exchangeOpen) {
+        status = "open";
+    } else if (openSession.name != "Closed") { // Any session that is not Core open or closed session
+        status = "extendedOpen";
+        subHead2.innerHTML = " But is open for extended trading, the current session is: " + openSession.name + ".";
+    } else {
+        status = "closed";
+    }
+
     // Regualr trading is " + coreOpenString + ", Monday - Friday.";
     li.appendChild(title);
     li.appendChild(timeTag);
     li.appendChild(subHead);
+    li.appendChild(subHead2);
+    li.appendChild(text);
     table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");
     li.classList.add(openSession.name.replace(/\s+/g, '-').toLowerCase());
     table.classList.add(openSession.name.replace(/\s+/g, '-').toLowerCase());
@@ -671,14 +795,7 @@ function generateListElement(exchange, exchangeTime, tableData) {
     //     closedExchanges.appendChild(li);
     // }
     
-    if (exchangeOpen) {
-        status = "open";
-    } else if (openSession.name != "Closed") { // Any session that is not Core open or closed session
-        status = "extendedOpen";
-    } else {
-        status = "closed";
-    }
-    
+
     
     // pivot.init({
     //     selector: "#" + exchange.nameShort.toLowerCase(),
@@ -784,6 +901,9 @@ for (key of exchangeData) {
 container.appendChild(openExchanges);
 container.appendChild(extendedOpenExchanges);
 container.appendChild(closedExchanges);
+
+document.getElementById("browserTimezone").innerHTML = localTime.zoneName;
+document.getElementById("detectedLocation").innerHTML = localTime.zoneName.split("/")[1] + ", " + ct.getCountryForTimezone(localTime.zoneName).name;
 
 // Rearrange so open exhanges are up the top
 // table = document.getElementById("tableContainer");

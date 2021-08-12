@@ -364,6 +364,26 @@ var exchanges = {
                 "duration" : 45
             }
         }
+    },
+    "cme" : {
+        "nameLong" : "Chicago Mercantile Exchange",
+        "nameShort" : "CME GLOBEX",
+        "timeZone" : "America/Chicago",
+        "openDays" : [2, 3, 4, 5, 6, 7],
+        "sessions" : {
+            "pre" : {
+                "name" : "Pre-Open",
+                "openHour" : 16,
+                "openMinute" : 45,
+                "duration" : 15
+            },
+            "core" : {
+                "name" : "Weekday",
+                "openHour" : 17,
+                "openMinute" : 0,
+                "duration" : 1380
+            }
+        }
     }
 }
 
@@ -438,6 +458,8 @@ const buildAcronym = (str = '') => {
 function whatSessionIsOpen(exchange, day) {
     sessions = Object.keys(exchange.sessions);
     
+    var openSessions = [];
+    
     for (key of sessions) {
         let session = exchange.sessions[key];
         
@@ -447,12 +469,21 @@ function whatSessionIsOpen(exchange, day) {
             second: 0 
         });
         
+        if (luxon.Duration.fromObject({ minutes: session.duration }).as("hours") > 12 && luxon.Duration.fromObject({ minutes: normalTrading.duration }).as("hours") < 24) {
+            open = open.plus({days: -1});   
+        }
+        
         let close = open.plus({ minutes: session.duration });
+        if (exchange.nameShort == "CME") {
+         console.log(exchange.nameShort +" "+close.toFormat("hh':'mm''a ccc"))
+         console.log(day < close)
+         // console.log("day > open: " + day > open +" day < close: "+day < close)   
+        }
     
         if (isThisDayATradingDay(exchange, day)) {
             
             if (day > open && day < close) {
-                return session;
+                openSessions.push(session);
             } 
             else {
                 continue;
@@ -462,10 +493,12 @@ function whatSessionIsOpen(exchange, day) {
             continue;
         }
     }
-    let session = { 
-        "name" : "Closed"
-        };
-    return session;
+    if (openSessions.length === 0) {
+        openSessions.push(session = { 
+            "name" : "Closed"
+            })
+    }
+    return openSessions;
 }
 
 function createTableData(exchange, exchangeTime, daysTilNextOpen) {
@@ -475,8 +508,7 @@ function createTableData(exchange, exchangeTime, daysTilNextOpen) {
     // let formatting = DateTime.TIME_24_SIMPLE;
     let formatting = "hh':'mm''a";
     
-    let openSession = whatSessionIsOpen(exchange, exchangeTime);
-    console.log(exchange.shortName + " " + openSession);
+    let openSessions = whatSessionIsOpen(exchange, exchangeTime);
     
     for (key of data) {
         let sessionData = {};
@@ -495,11 +527,16 @@ function createTableData(exchange, exchangeTime, daysTilNextOpen) {
         sessionData["Exchange Time (" + buildAcronym(sessionOpen.toFormat("ZZZZZ")) + ")"] = sessionOpen.toFormat(formatting).toLowerCase() + " - " + sessionClose.toFormat(formatting).toLowerCase();
         sessionData["Local Time (" + buildAcronym(localTime.toFormat("ZZZZZ")) + ")"] = sessionOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
         // sessionData["Exchange Time"] = "<span>" + sessionOpen.toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
-        // sessionData["Local Time"] = "<span>" + sessionOpen.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
-        if (openSession == session) {
+        // sessionData["Local Time"] = "<span>" + sessionOpen.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>";\
+        
+        if (openSessions.includes(session)) {
             sessionData["Countdown"] = "Now";
         } else {
+            if (openSessions[0].name == "Closed") {
+                sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
+            } else {
             sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
+        }   
         }
         
         // sessionData["Relative Close"] = sessionClose.toRelative( { unit: ["hours", "minutes"]});
@@ -571,6 +608,10 @@ function generateTable(table, data) {
             if (key.includes("Time")) {
                 cell.setAttribute("class", "time");   
             }
+            
+            if (element[key] == "Now") {
+                row.classList.add("now");
+            }
             let text = document.createTextNode(element[key]);
             // cell.appendChild(text);
             cell.innerHTML = element[key];
@@ -613,6 +654,10 @@ function isExchangeOpen(exchange, day = 0) {
             minute: normalTrading.openMinute, 
             second: 0 
         });
+        
+        if (luxon.Duration.fromObject({ minutes: normalTrading.duration }).as("hours") > 12 && luxon.Duration.fromObject({ minutes: normalTrading.duration }).as("hours") < 24) {
+            open = open.plus({days: -1});   
+        }
         
         let close = open.plus({ minutes: normalTrading.duration });
     
@@ -685,6 +730,21 @@ function isExchangeOpen(exchange, day = 0) {
 
 // console.log("1: " + exchangeTime.plus({ days: 1 }).toLocaleString(DateTime.TIME_SIMPLE));
 
+function getDaysTilNextOpen (exchange, exchangeTime) {
+    let exchangeOpenOnThisDay = isThisDayATradingDay(exchange, exchangeTime);
+    let daysTilNextOpen = 0;
+    for (var i=0; i < 7; i++) {
+        if (!exchangeOpenOnThisDay) {
+            daysTilNextOpen++;
+            exchangeOpenOnThisDay = isThisDayATradingDay(exchange, exchangeTime.plus({ days: daysTilNextOpen }))
+            if (exchangeOpenOnThisDay) {
+                break;
+            }
+        }
+    }
+    return daysTilNextOpen;
+}
+
 
 
 function generateListElement(exchange, exchangeTime, tableData) {
@@ -709,7 +769,7 @@ function generateListElement(exchange, exchangeTime, tableData) {
     
     let coreOpenString = coreOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + coreClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
     
-    let openSession = whatSessionIsOpen(exchange, exchangeTime);
+    let openSessions = whatSessionIsOpen(exchange, exchangeTime);
     let openDays = [exchange.openDays[0], exchange.openDays[exchange.openDays.length - 1]];
     var openDaysString = [];
     for (var i=0; i<2; i++) {
@@ -744,8 +804,12 @@ function generateListElement(exchange, exchangeTime, tableData) {
     
     let table = document.createElement('table');
     let title = document.createElement("h1");
+    title.classList.add("title")
     let subHead = document.createElement("h3");
     let timeTag = document.createElement("time");
+    let countDownTitle = document.createElement("h3");
+    let countdown = document.createElement("h1");
+    countdown.classList.add("countdown");
     let text = document.createElement("p");
     
     let referral = document.createElement("p");
@@ -753,19 +817,49 @@ function generateListElement(exchange, exchangeTime, tableData) {
     referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks from " + localCountry.name;
     
     timeTag.innerHTML = exchangeTime.toFormat("cccc, L LLLL y");
-    title.innerHTML = exchange.nameLong;
-    subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for trading.";
+    // title.innerHTML = "<span class='left'>" + exchange.nameLong + "</span><span class='right'>" + countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + "</span>";
+    // title.innerHTML = exchange.nameLong + "<span class='emoji'>" + countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + "</span>";
+    if (exchange.nameShort == "BTC") {
+        title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " +exchange.nameLong + "<time>" + exchangeTime.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
+    } else {
+        title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + " " + exchange.nameLong + "<time>" + exchangeTime.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
+    }
+    subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for regular trading.";
     text.innerHTML = "Trading week: " + openDaysString[0] + " - " + openDaysString[1];
     
     let subHead2 = document.createElement("p");
     
+    openSessionTimeOpen = exchangeTime.set({ 
+        hour: openSessions[0].openHour, 
+        minute: openSessions[0].openMinute, 
+        second: 0 
+    });
+    
+    if (luxon.Duration.fromObject({ minutes: openSessions[0].duration }).as("hours") > 12 && luxon.Duration.fromObject({ minutes: normalTrading.duration }).as("hours") < 24) {
+        openSessionTimeOpen = openSessionTimeOpen.plus({days: -1});   
+    }
+    let openSessionTimeClose = openSessionTimeOpen.plus({ minute: openSessions[0].duration });
+    
     if (exchangeOpen) {
         status = "open";
-    } else if (openSession.name != "Closed") { // Any session that is not Core open or closed session
+        // countDownTitle.innerHTML = "Closing bell: ";
+        countdown.innerHTML = "Closing " + openSessionTimeClose.toRelative( { unit: ["hours", "minutes"]}) + ".";
+    } else if (openSessions[0].name != "Closed") { // Any session that is not Core open or closed session
         status = "extendedOpen";
-        subHead2.innerHTML = " But is open for extended trading, the current session is: " + openSession.name + ".";
+        if (openSessions.length == 1) {
+            subHead2.innerHTML = " But is open for extended trading, the current session is: " + openSessions[0].name + ".";
+        } else {
+            subHead2.innerHTML = " But is open for extended trading, the current sessions are: ";
+            openSessions.forEach((session) => {
+                subHead2.innerHTML.concat(", ", session.name);
+            })
+
+        }
+        
     } else {
         status = "closed";
+        // countDownTitle.innerHTML = "Opening bell: ";
+        countdown.innerHTML = "Opening " + coreOpen.plus({days: daysTilNextOpen}).toRelative( { unit: ["hours", "minutes"]}) + ".";
     }
 
     // Regualr trading is " + coreOpenString + ", Monday - Friday.";
@@ -773,10 +867,17 @@ function generateListElement(exchange, exchangeTime, tableData) {
     li.appendChild(timeTag);
     li.appendChild(subHead);
     li.appendChild(subHead2);
+    li.appendChild(countDownTitle)
+    li.appendChild(countdown);
     li.appendChild(text);
     table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");
-    li.classList.add(openSession.name.replace(/\s+/g, '-').toLowerCase());
-    table.classList.add(openSession.name.replace(/\s+/g, '-').toLowerCase());
+    openSessions.forEach((session) => {
+        // li.classList.add(openSessions[session].name.replace(/\s+/g, '-').toLowerCase());
+        // table.classList.add(openSessions[session].name.replace(/\s+/g, '-').toLowerCase());
+        li.classList.add(session.name.replace(/\s+/g, '-').toLowerCase());
+        table.classList.add(session.name.replace(/\s+/g, '-').toLowerCase());
+    })
+    
     console.log(exchangeOpen);
     if (exchangeOpen) {
         table.classList.add("open");
@@ -789,7 +890,7 @@ function generateListElement(exchange, exchangeTime, tableData) {
     
     // if (exchangeOpen) {
     //     openExchanges.appendChild(li);
-    // } else if (openSession.name != "Closed") { // Any session that is not Core open or closed session
+    // } else if (openSessions.name != "Closed") { // Any session that is not Core open or closed session
     //     extendedOpenExchanges.appendChild(li);
     // } else {
     //     closedExchanges.appendChild(li);
@@ -835,17 +936,7 @@ for (key of exchangeData) {
     //     console.log(exchangeOpenOnThisDay);
     // }
     
-    let daysTilNextOpen = 0;
-    for (var i=0; i < 7; i++) {
-        if (!exchangeOpenOnThisDay) {
-            daysTilNextOpen++;
-            exchangeOpenOnThisDay = isThisDayATradingDay(exchange, exchangeTime.plus({ days: daysTilNextOpen }))
-            if (exchangeOpenOnThisDay) {
-                break;
-            }
-        }
-    }
-
+    daysTilNextOpen = getDaysTilNextOpen(exchange, exchangeTime);
     
     
     // console.log(daysTilNextOpen);
@@ -861,11 +952,11 @@ for (key of exchangeData) {
     
     [li, table] = generateListElement(exchange, exchangeTime, tableData);
     
-    let openSession = whatSessionIsOpen(exchange, exchangeTime);
+    let openSessions = whatSessionIsOpen(exchange, exchangeTime);
 
     if (exchangeOpen) {
         openExchanges.appendChild(li);
-    } else if (openSession.name != "Closed") { // Any session that is not Core open or closed session
+    } else if (openSessions[0].name != "Closed") { // Any session that is not Core open or closed session
         extendedOpenExchanges.appendChild(li);
     } else {
         closedExchanges.appendChild(li);
@@ -873,7 +964,7 @@ for (key of exchangeData) {
     
     // if (exchangeOpen) {
     //     container.insertBefore(li, container.firstChild);
-    // } else if (openSession.name != "Closed") { // Any session that is not Core open or closed session
+    // } else if (openSessions.name != "Closed") { // Any session that is not Core open or closed session
     //     container.insertBefore(li, container.firstChild);
     // } else {
     //     container.appendChild(li);

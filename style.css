@@ -14,6 +14,8 @@ h1.title {
 
 h1 time {
 	font-family: ui-rounded;
+	text-align: right;
+	min-width: 4em; 
 }
 
 h1.countdown {
@@ -151,6 +153,16 @@ ul li.open {
 	background: #76b852;  /* fallback for old browsers */
 	/* background: linear-gradient(to bottom, #8DC26F, #76b852); */
 	background: linear-gradient(#69d979, #28c941);
+}
+
+li.ad {
+	background: linear-gradient(rgb(196, 181, 253), rgb(167, 139, 250));
+	text-align: center;
+}
+
+li.ad img {
+	height: 400px;
+	padding: 1em;
 }
 
 table .time {

@@ -188,7 +188,7 @@ var exchanges = {
                 "openMinute" : 10,
                 "duration" : 2
             },
-            "adjuust" : {
+            "adjust" : {
                 "name" : "Adjust",
                 "openHour" : 16,
                 "openMinute" : 12,
@@ -814,7 +814,7 @@ function generateListElement(exchange, exchangeTime, tableData) {
     
     let referral = document.createElement("p");
     const localCountry = ct.getCountryForTimezone(localTime.zoneName);
-    referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks from " + localCountry.name;
+    referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks in " + localCountry.name;
     
     timeTag.innerHTML = exchangeTime.toFormat("cccc, L LLLL y");
     // title.innerHTML = "<span class='left'>" + exchange.nameLong + "</span><span class='right'>" + countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + "</span>";
@@ -822,7 +822,7 @@ function generateListElement(exchange, exchangeTime, tableData) {
     if (exchange.nameShort == "BTC") {
         title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " +exchange.nameLong + "<time>" + exchangeTime.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
     } else {
-        title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + " " + exchange.nameLong + "<time>" + exchangeTime.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
+        title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + " " + exchange.nameLong + " (" + exchange.nameShort + ") " + "<time>" + exchangeTime.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
     }
     subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for regular trading.";
     text.innerHTML = "Trading week: " + openDaysString[0] + " - " + openDaysString[1];
@@ -835,15 +835,23 @@ function generateListElement(exchange, exchangeTime, tableData) {
         second: 0 
     });
     
+    // Check if session duration crosses two days
+    var fullDuration = openSessions[0].duration;
     if (luxon.Duration.fromObject({ minutes: openSessions[0].duration }).as("hours") > 12 && luxon.Duration.fromObject({ minutes: normalTrading.duration }).as("hours") < 24) {
         openSessionTimeOpen = openSessionTimeOpen.plus({days: -1});   
-    }
-    let openSessionTimeClose = openSessionTimeOpen.plus({ minute: openSessions[0].duration });
+    } else if (openSessions[0].name == "Lunch") {
+        console.log(exchange.sessions.lunch)
+        fullDuration = fullDuration + exchange.sessions.lunch.duration + exchange.sessions.lunch.duration;
+    } 
+    let openSessionTimeClose = openSessionTimeOpen.plus({ minutes: fullDuration });
     
     if (exchangeOpen) {
         status = "open";
-        // countDownTitle.innerHTML = "Closing bell: ";
-        countdown.innerHTML = "Closing " + openSessionTimeClose.toRelative( { unit: ["hours", "minutes"]}) + ".";
+        if (exchange.nameShort == "BTC") {
+            countdown.innerHTML = "Never closes.";
+        } else {
+            countdown.innerHTML = "Closing " + openSessionTimeClose.toRelative( { unit: ["hours", "minutes"]}) + ".";
+        }
     } else if (openSessions[0].name != "Closed") { // Any session that is not Core open or closed session
         status = "extendedOpen";
         if (openSessions.length == 1) {
@@ -859,7 +867,12 @@ function generateListElement(exchange, exchangeTime, tableData) {
     } else {
         status = "closed";
         // countDownTitle.innerHTML = "Opening bell: ";
-        countdown.innerHTML = "Opening " + coreOpen.plus({days: daysTilNextOpen}).toRelative( { unit: ["hours", "minutes"]}) + ".";
+        console.log(exchangeTime.diff(exchangeTime.plus({days: daysTilNextOpen})))
+        if ( exchangeTime.diff(coreOpen.plus({days: daysTilNextOpen})) > 0  ) {
+            countdown.innerHTML = "Opening " + coreOpen.plus({days: daysTilNextOpen + 1}).toRelative( { unit: ["hours", "minutes"]}) + ".";
+        } else {
+            countdown.innerHTML = "Opening " + coreOpen.plus({days: daysTilNextOpen}).toRelative( { unit: ["hours", "minutes"]}) + ".";   
+        }
     }
 
     // Regualr trading is " + coreOpenString + ", Monday - Friday.";
@@ -989,9 +1002,48 @@ for (key of exchangeData) {
     // generateTableHead(lseTable, lseData);
 }
 
+ad = document.createElement("li");
+ad.classList.add("ad", "exchange-item");
+
+
+let title = document.createElement("h1");
+title.innerHTML = "Ad";
+let adImg = document.createElement("img");
+adImg.setAttribute("src", "testAd.png");
+// title.classList.add("title")
+// let subHead = document.createElement("h3");
+// let timeTag = document.createElement("time");
+// let countDownTitle = document.createElement("h3");
+// let countdown = document.createElement("h1");
+// countdown.classList.add("countdown");
+let text = document.createElement("p");
+text.innerHTML = "MariahCoin to the moon.";
+
+// ad.appendChild(title);
+ad.appendChild(adImg);
+// li.appendChild(timeTag);
+// li.appendChild(subHead);
+// li.appendChild(subHead2);
+// li.appendChild(countDownTitle)
+// li.appendChild(countdown);
+ad.appendChild(text);
+
+// console.log(container.childNodes.length())
+
+// openExchanges.insertBefore(ad, container.childNodes[2]);
+
 container.appendChild(openExchanges);
 container.appendChild(extendedOpenExchanges);
 container.appendChild(closedExchanges);
+
+adLocation = Math.floor(Math.random() * container.childNodes.length);
+console.log(adLocation)
+adLocation2 = Math.floor(Math.random() * container.childNodes[adLocation].childNodes.length);
+console.log(adLocation2)
+console.log(container.childNodes[adLocation].childNodes[adLocation2])
+// container.childNodes[adLocation].childNodes[adLocation2].insertNode(ad);
+container.childNodes[adLocation].insertBefore(ad, container.childNodes[adLocation].childNodes[adLocation2 + 1]);
+
 
 document.getElementById("browserTimezone").innerHTML = localTime.zoneName;
 document.getElementById("detectedLocation").innerHTML = localTime.zoneName.split("/")[1] + ", " + ct.getCountryForTimezone(localTime.zoneName).name;

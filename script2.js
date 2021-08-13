@@ -299,6 +299,7 @@ var exchanges = {
     "btc" : {
         "nameLong" : "Bitcoin Exchanges",
         "nameShort" : "BTC",
+        "timeZone" : "Europe/London",
         "openDays" : [1, 2, 3, 4, 5, 6, 7],
         "sessions" : {
             "core" : {
@@ -469,7 +470,8 @@ function whatSessionIsOpen(exchange, day) {
             second: 0 
         });
         
-        if (luxon.Duration.fromObject({ minutes: session.duration }).as("hours") > 12 && luxon.Duration.fromObject({ minutes: normalTrading.duration }).as("hours") < 24) {
+        if (luxon.Duration.fromObject({ minutes: session.duration }).as("hours") > 12 && luxon.Duration.fromObject({ minutes: session.duration }).as("hours") < 24) {
+            // if (luxon.Duration.fromObject({ minutes: session.duration }).as("hours") > 12) {
             open = open.plus({days: -1});   
         }
         
@@ -529,14 +531,23 @@ function createTableData(exchange, exchangeTime, daysTilNextOpen) {
         // sessionData["Exchange Time"] = "<span>" + sessionOpen.toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.toLocaleString(DateTime.TIME_SIMPLE) + "</span>";
         // sessionData["Local Time"] = "<span>" + sessionOpen.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>" + " - " + "<span>" + sessionClose.setZone(localTimeZone).toLocaleString(DateTime.TIME_SIMPLE) + "</span>";\
         
+        // if (openSessions.includes(session)) {
+        //     sessionData["Countdown"] = "Now";
+        // } else {
+        //     if (openSessions[0].name == "Closed") {
+        //         sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
+        //     } else {
+        //     sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
+        // }   
+        // }
+        
+        // Check if the market has closed for today
         if (openSessions.includes(session)) {
             sessionData["Countdown"] = "Now";
-        } else {
-            if (openSessions[0].name == "Closed") {
-                sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
-            } else {
+        } else if (exchangeTime.diff(sessionOpen.plus({days: daysTilNextOpen})) > 0) {
             sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
-        }   
+        } else {
+            sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
         }
         
         // sessionData["Relative Close"] = sessionClose.toRelative( { unit: ["hours", "minutes"]});
@@ -820,12 +831,24 @@ function generateListElement(exchange, exchangeTime, tableData) {
     // title.innerHTML = "<span class='left'>" + exchange.nameLong + "</span><span class='right'>" + countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + "</span>";
     // title.innerHTML = exchange.nameLong + "<span class='emoji'>" + countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + "</span>";
     if (exchange.nameShort == "BTC") {
-        title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " +exchange.nameLong + "<time>" + exchangeTime.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
+        title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " + exchange.nameLong + " (" + exchange.nameShort + ") " + "<time>" + exchangeTime.toFormat("h':'mm''a").toLowerCase() + "</time>" ;
     } else {
-        title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + " " + exchange.nameLong + " (" + exchange.nameShort + ") " + "<time>" + exchangeTime.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
+        title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(exchangeTime.zoneName).id).emoji + " " + exchange.nameLong + " (" + exchange.nameShort.split(" ")[0] + ") " + "<time>" + exchangeTime.toFormat("h':'mm''a").toLowerCase() + "</time>" ;
     }
     subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for regular trading.";
-    text.innerHTML = "Trading week: " + openDaysString[0] + " - " + openDaysString[1];
+    differenceInOffset = exchangeTime.offset - localTime.offset;
+    var relativeOffset;
+    var offset = luxon.Duration.fromObject({ minutes: Math.abs(differenceInOffset) }).shiftTo("hours", "minutes").toObject();
+    if (differenceInOffset <= 0 ) {
+        relativeOffset = "behind";
+    } else {
+        relativeOffset = "ahead of";
+    }
+    text.innerHTML = "Trading week: " + openDaysString[0] + " - " + openDaysString[1] + "<br>" +
+        "Timezone: " + exchangeTime.toFormat("ZZZZZ") + " (UTC" + exchangeTime.toFormat("ZZ") + ") " + "<br>" +
+        "Location: " + exchangeTime.zoneName.split("/")[1].replace(/_/g, ' ') + ", " + ct.getCountryForTimezone(exchangeTime.zoneName).name  + "<br>" +
+        "Offset: " + exchangeTime.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ')
+        ;
     
     let subHead2 = document.createElement("p");
     
@@ -837,8 +860,10 @@ function generateListElement(exchange, exchangeTime, tableData) {
     
     // Check if session duration crosses two days
     var fullDuration = openSessions[0].duration;
-    if (luxon.Duration.fromObject({ minutes: openSessions[0].duration }).as("hours") > 12 && luxon.Duration.fromObject({ minutes: normalTrading.duration }).as("hours") < 24) {
-        openSessionTimeOpen = openSessionTimeOpen.plus({days: -1});   
+    // if (luxon.Duration.fromObject({ minutes: openSessions[0].duration }).as("hours") > 12 && luxon.Duration.fromObject({ minutes: openSessions[0].duration }).as("hours") < 24) {
+        if (luxon.Duration.fromObject({ minutes: openSessions[0].duration }).as("hours") > 12) {
+
+        openSessionTimeOpen = openSessionTimeOpen.plus({days: -1});
     } else if (openSessions[0].name == "Lunch") {
         console.log(exchange.sessions.lunch)
         fullDuration = fullDuration + exchange.sessions.lunch.duration + exchange.sessions.lunch.duration;
@@ -848,27 +873,24 @@ function generateListElement(exchange, exchangeTime, tableData) {
     if (exchangeOpen) {
         status = "open";
         if (exchange.nameShort == "BTC") {
-            countdown.innerHTML = "Never closes.";
+            countdown.innerHTML = "Never closes";
         } else {
-            countdown.innerHTML = "Closing " + openSessionTimeClose.toRelative( { unit: ["hours", "minutes"]}) + ".";
+            countdown.innerHTML = "Closing " + openSessionTimeClose.toRelative( { unit: ["hours", "minutes"]});
         }
     } else if (openSessions[0].name != "Closed") { // Any session that is not Core open or closed session
         status = "extendedOpen";
         if (openSessions.length == 1) {
-            subHead2.innerHTML = " But is open for extended trading, the current session is: " + openSessions[0].name + ".";
+            subHead.innerHTML = "The " + exchange.nameShort + " is open for extended trading.";
+            countdown.innerHTML =  "Opening " + coreOpen.plus({days: daysTilNextOpen}).toRelative( { unit: ["hours", "minutes"]}) + "."; 
         } else {
-            subHead2.innerHTML = " But is open for extended trading, the current sessions are: ";
+            subHead.innerHTML = "The " + exchange.nameShort + " is open for extended trading, the current session are:";
             openSessions.forEach((session) => {
-                subHead2.innerHTML.concat(", ", session.name);
+                subHead.innerHTML.concat(", ", session.name);
             })
-
         }
-        
     } else {
         status = "closed";
-        // countDownTitle.innerHTML = "Opening bell: ";
-        console.log(exchangeTime.diff(exchangeTime.plus({days: daysTilNextOpen})))
-        if ( exchangeTime.diff(coreOpen.plus({days: daysTilNextOpen})) > 0  ) {
+        if (exchangeTime.diff(coreOpen.plus({days: daysTilNextOpen})) > 0) {
             countdown.innerHTML = "Opening " + coreOpen.plus({days: daysTilNextOpen + 1}).toRelative( { unit: ["hours", "minutes"]}) + ".";
         } else {
             countdown.innerHTML = "Opening " + coreOpen.plus({days: daysTilNextOpen}).toRelative( { unit: ["hours", "minutes"]}) + ".";   
@@ -878,11 +900,10 @@ function generateListElement(exchange, exchangeTime, tableData) {
     // Regualr trading is " + coreOpenString + ", Monday - Friday.";
     li.appendChild(title);
     li.appendChild(timeTag);
+    li.appendChild(countdown);
     li.appendChild(subHead);
     li.appendChild(subHead2);
-    li.appendChild(countDownTitle)
-    li.appendChild(countdown);
-    li.appendChild(text);
+    li.appendChild(countDownTitle);
     table.setAttribute("id", exchange.nameShort.toLowerCase() + "Table");
     openSessions.forEach((session) => {
         // li.classList.add(openSessions[session].name.replace(/\s+/g, '-').toLowerCase());
@@ -898,6 +919,7 @@ function generateListElement(exchange, exchangeTime, tableData) {
     }
     
     li.appendChild(table);
+    li.appendChild(text);
     // container.appendChild(li);
     li.appendChild(referral);
     
@@ -1036,6 +1058,9 @@ container.appendChild(openExchanges);
 container.appendChild(extendedOpenExchanges);
 container.appendChild(closedExchanges);
 
+// container.appendChild( openExchanges.appendChild((extendedOpenExchanges).appendChild(closedExchanges)) );
+// container.appendChild( openExchanges.appendChild(extendedOpenExchanges) )
+
 adLocation = Math.floor(Math.random() * container.childNodes.length);
 console.log(adLocation)
 adLocation2 = Math.floor(Math.random() * container.childNodes[adLocation].childNodes.length);
@@ -1159,11 +1184,18 @@ document.getElementById("detectedLocation").innerHTML = localTime.zoneName.split
     //   document.body.appendChild(newScript);
     // }
     
+    const supportsMasonry = CSS.supports('grid-template-rows', 'masonry');
+    
+    if (supportsMasonry) {
+      console.log('Native masonry is supported, do nothing');
+    } else {
     const elem = document.querySelector('.masonry');
     const msnry = new Masonry( elem, {
       // options
-      itemSelector: '.exchange-item'
+      itemSelector: '.exchange-item',
+      fitWidth: true
     });
+}
     
 
 

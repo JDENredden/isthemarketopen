@@ -10,6 +10,16 @@ body {
 	margin-bottom: 0;
 } */
 
+h1.main-title {
+	font-size: 5em;
+	text-align: center;
+}
+
+h2.sub-head {
+	font-size: 2em;
+	text-align: center;
+}
+
 h1.title {
 	display: flex;
 	justify-content: space-between;
@@ -201,12 +211,47 @@ ul.exchange-list > li.open {
 ul.exchange-list > li.ad {
 	background: linear-gradient(rgb(196, 181, 253), rgb(167, 139, 250));
 	text-align: center;
+	height: calc(286px + 2em);
 }
 
-ul.exchange-list > li.ad img {
-	height: 400px;
+.aa_container, .aa_logo {
+	background-color: transparent;
+}
+
+.aa_container a, .aa_container span, .aa_container small a {
+	color: white;
+}
+
+.aa_container .row {
+	border-color: white !important;
+}
+
+li iframe {
+	border: 3px solid white;
+	margin-top: 1em;
+	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
+}
+
+li .fallback {
+	/* position: absolute; */
+	z-index: 1;
+	margin: 0 auto;
+	margin-top: -290px;
+	width:336px;
+	height:280px;
+	/* padding: 1em; */
+	border: 3px solid white;
+	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
+}
+
+li .fallback p {
 	padding: 1em;
 }
+
+/* ul.exchange-list > li.ad img {
+	height: 400px;
+	padding: 1em;
+} */
 
 tbody tr td:first-child {
 	text-align: left;

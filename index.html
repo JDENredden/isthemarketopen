@@ -1,69 +1,78 @@
 <!doctype html>
 <html>
   <head>
-    <title>This is the title of the webpage!</title>
+    <title>When does the market open?</title>
+    <script type="text/javascript">
+      window._mNHandle = window._mNHandle || {};
+      window._mNHandle.queue = window._mNHandle.queue || [];
+      medianet_versionId = "3121199";
+  </script>
+  <script src="https://contextual.media.net/dmedianet.js?cid=8CUMI2650" async="async"></script>
+
   </head>
+<link rel="stylesheet" href="style.css">
 
   <body>
-    <link rel="stylesheet" href="style.css">
 <!--    <p>The requested location is <em id="location"></em> and the time is <em id="time"></em></p>-->
 <!--    <p>Your location is <em id="localLocation"></em> and the time is <em id="localTime"></em></p>-->
       
-    <h1>When does the market open?</h1>
-      <p><span id="status"></span>. It <span id="statusVerb"></span> <span id="statusTime"></span>. The core trading session is from <span id="coreOpen"></span> to <span id="coreClose"></span> in <span id="exchangeCity"></span>, which is <span id="localCoreOpen"></span> to <span id="localCoreClose"></span> in <span id="localCity"></span></p>
-      <p><strong>Current time in <span id="localLocation"></span> is <span id="localTime"></span></strong></p>
-      <p><strong>Current time in <span id="location"></span> is <span id="time"></span></strong></p>
-    <!-- <table id="table">
-  <tr>
-    <th>Session</th>
-    <th>Exchange Time</th>
-    <th>Local Time</th>
-    <th>Countdown</th>
-  </tr>
-    <tr>
-    <td>Pre-Market Open</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Pre-Market Close</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Open</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Close</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>After-Market Open</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>After-Market Close</td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-      </table> -->
+    <h1 class="main-title">When does the market open?</h1>
+    <h2 class="sub-head">A website by <a href="https://twitter.com/jden">@jden</a>.</h2>
       <ul id="tableContainer" class="masonry"></ul>
       <table id="testTable"></table>
       <table id="lseTable"></table>
+      <li id="ad">
+        <!-- <h1 class="title">💸 Ads</h1> -->
+        <!-- <div id="container-727c14fa740149ed6c4d984df64bdcb8"></div> -->
+        <!-- <iframe data-aa="1743823" src="https://ad.a-ads.com/1743823?size=300x250" style="width:300px; height:250px; border:0px; padding:0; overflow:hidden; background-color: transparent;" ></iframe> -->
+        <!-- <iframe data-aa="1743836" src="https://ad.a-ads.com/1743836?size=336x280&background_color=transparent&text_color=ffffff&title_color=ffffff&title_hover_color=ffffff&link_color=ffffff&link_hover_color=ffffff" style="width:336px; height:280px; border:3px solid white; border-radius:1em 0 1em 1em; padding:0; overflow:hidden; background-color: rgba(255, 255, 255, 0.2);"></iframe> -->
+        
+        <iframe id="aa-ad" data-aa="1743836" src="https://ad.a-ads.com/1743836?size=336x280&background_color=transparent&text_color=ffffff&title_color=ffffff&title_hover_color=ffffff&link_color=ffffff&link_hover_color=ffffff" style="width:336px; height:280px; border:3px solid white; border-radius:1em 0 1em 1em; padding:0; overflow:hidden; background-color: rgb(196, 181, 253);"></iframe>
+        
+        <article class="fallback">
+          <h2>Ads suck.</h2>
+            <h3>I get it. I block them too.</h3>
+          
+          <p>Ads help me pay for maintaining this website. You can still support me by:)</p>
+            <ul class="fallback-list">
+              <li>using my referral links on this page to sign up for a broker to trade global stocks.</li>
+              <li>Buying me a coffee.</li>
+            </ul>
+            <p>I use NextDNS to block ads at the network DNS level.
+            </p>
+          
+          
+        </article>
+      <!-- <script type="text/javascript">
+        atOptions = {
+          'key' : 'f87a01fb9d81d4a56680550f54cdd8db',
+          'format' : 'iframe',
+          'height' : 250,
+          'width' : 300,
+          'params' : {}
+        };
+        document.write('<scr' + 'ipt type="text/javascript" src="http' + (location.protocol === 'https:' ? 's' : '') + '://www.effectivedisplayformat.com/f87a01fb9d81d4a56680550f54cdd8db/invoke.js"></scr' + 'ipt>');
+      </script> -->
+      </li>
+      <div id="133767191">
+        <script type="text/javascript">
+            try {
+                window._mNHandle.queue.push(function (){
+                    window._mNDetails.loadTag("133767191", "300x250", "133767191");
+                });
+            }
+            catch (error) {}
+        </script>
+      </div>
+      <script async defer src="https://api.whendoesthemarketopen.com/latest.js"></script> 
+      <noscript><img src="https://api.whendoesthemarketopen.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript>
   </body>
   <footer>WhenDoesTheMarketOpen automatically displays the time in your time zone by using your browser's time zone to detect your location. Your browser's time zone is <strong id="browserTimezone"></strong>. Your detected location is <strong id="detectedLocation"></strong>.</footer>
-    <script src="https://cdn.rawgit.com/wnda/pivot/master/pivot.js"></script>
+    <!-- <script src="https://cdn.rawgit.com/wnda/pivot/master/pivot.js"></script> -->
     <script src="exchangeData.js"></script>
+    <!-- <script async src="https://cdn.contextcue.com/adsbycontextcue.js"></script> -->
+    <script async="async" data-cfasync="false" src="https://pl16507235.highperformancecpm.com/727c14fa740149ed6c4d984df64bdcb8/invoke.js"></script>
+
         <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.1/build/global/luxon.min.js"></script>
         <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/manuelmhtr/countries-and-timezones@latest/dist/index.js" type="text/javascript"></script>
@@ -72,4 +81,17 @@
         <!-- <script src="https://cdn.jsdelivr.net/npm/macy@2"></script> -->
     <!-- <script src="script2.js"></script> -->
     <script src="script3.js"></script>
+    <!-- <script src="detect.js"></script> -->
+    <!-- <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" onerror="console.log('onerror blocked');"></script> -->
+
+    <!-- <script type="text/javascript">
+      justDetectAdblock.detectAnyAdblocker().then(function(detected) {
+        if(detected){
+          ad = document.getElementById("ad");
+          ad.innerHTML("Blocked");
+          console.log("Blocked");
+        }
+      });
+    </script> -->
+
 </html>

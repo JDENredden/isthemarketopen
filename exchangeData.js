@@ -424,7 +424,7 @@ var exchanges = {
 	},
 	"tadawul" : {
 		"nameLong" : "Saudi Stock Exchange",
-		"nameShort" : "TADAWUL",
+		"nameShort" : "Tadawul",
 		"timeZone" : "Asia/Riyadh",
 		"openDays" : [7, 1, 2, 3, 4],
 		"sessions" : {

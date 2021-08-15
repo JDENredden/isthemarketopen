@@ -65,6 +65,7 @@ function createTableData(exchange, time, daysTilNextOpen) {
 	let formatting = "hh':'mm''a";
 	
 	let openSessions = whatSessionIsOpen(exchange, time);
+	let todayIsTradingDay = isThisDayATradingDay(exchange, time);
 	
 	let coreOpen = time.set({ 
 		hour: exchange.sessions.core.openHour, 
@@ -97,7 +98,7 @@ function createTableData(exchange, time, daysTilNextOpen) {
 		if (openSessions.includes(session)) {
 			sessionData["Countdown"] = "Now";
 		// } else if (time.diff(sessionOpen.plus({days: daysTilNextOpen})) > 0) {
-		} else if (time.diff(sessionClose) > 0 ) {
+		} else if (time.diff(sessionClose) > 0 && todayIsTradingDay) {
 			sessionData["Countdown"] = sessionClose.toRelative({ unit: ["hours", "minutes"] });
 		} else {
 			sessionData["Countdown"] = sessionOpen.plus({ days: daysTilNextOpen }).toRelative({ unit: ["hours", "minutes"] });
@@ -228,6 +229,22 @@ function generateListElement(exchange, time, tableData) {
 		second: 0 
 	});
 	
+	//Testing
+	// if (exchange.nameShort == "CME GLOBEX") {
+	// 	console.log("Time: " + time.weekday)
+	// 	console.log("Open: " + coreOpen.weekday);
+	// 	console.log("Close: " + coreOpen.plus({ minute: exchange.sessions.core.duration }).weekday);
+	// 	// console.log(coreOpen.diff(time));
+	// 	// console.log(time.diff(coreOpen));
+	// 	daySessionOpened = time.plus(time.diff(coreOpen));
+	// 	console.log("day session opened: " + daySessionOpened.weekday)
+	// }
+	
+	// If the session opened yesterday
+	if (time.plus(time.diff(coreOpen)).weekday < time.weekday) {
+		coreOpen = coreOpen.plus({ days: -1 });
+	}
+	
 	if (exchange.sessions.core2) {
 		coreOpen = time.set({ 
 			hour: exchange.sessions.core2.openHour, 
@@ -237,6 +254,11 @@ function generateListElement(exchange, time, tableData) {
 		coreClose = coreOpen.plus({ minute: exchange.sessions.core2.duration });	
 	} else {
 		coreClose = coreOpen.plus({ minute: exchange.sessions.core.duration });
+	} 
+	
+	// If session closes the day after it opened.
+	if (coreClose.weekday - time.weekday < 0) {
+		coreClose = coreClose.plus({days: -1});
 	}
 	
 	let coreOpenString = coreOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + coreClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
@@ -336,10 +358,12 @@ function generateListElement(exchange, time, tableData) {
 		if (luxon.Duration.fromObject({ minutes: openSessions[0].duration }).as("hours") > 12) {
 		openSessionTimeOpen = openSessionTimeOpen.plus({days: -1});
 	} else if (openSessions[0].name == "Lunch") {
-		console.log(exchange.sessions.lunch)
+		// console.log(exchange.sessions.lunch)
 		fullDuration = fullDuration + exchange.sessions.lunch.duration + exchange.sessions.lunch.duration;
 	} 
 	let openSessionTimeClose = openSessionTimeOpen.plus({ minutes: fullDuration });
+	
+	let todayIsTradingDay = isThisDayATradingDay(exchange, time);
 	
 	if (exchangeOpen) {
 		status = "open";
@@ -365,7 +389,7 @@ function generateListElement(exchange, time, tableData) {
 		}
 	} else {
 		status = "closed";
-		if (time.diff(coreClose) > 0) {
+		if (time.diff(coreClose) > 0 && todayIsTradingDay) {
 			countdown.innerHTML = "Closed " + coreClose.toRelative( { unit: ["hours", "minutes"]});
 		} else {
 			countdown.innerHTML = "Opening " + coreOpen.plus({days: daysTilNextOpen}).toRelative( { unit: ["hours", "minutes"]});   
@@ -385,7 +409,7 @@ function generateListElement(exchange, time, tableData) {
 		table.classList.add(session.name.replace(/\s+/g, '-').toLowerCase());
 	})
 	
-	console.log(exchangeOpen);
+	// console.log(exchangeOpen);
 	if (exchangeOpen) {
 		table.classList.add("open");
 		li.classList.add("open");
@@ -400,7 +424,8 @@ function generateListElement(exchange, time, tableData) {
 }
 
 function generateAds() {
-	ad = document.createElement("li");
+	// ad = document.createElement("li");
+	document.getElementById("ad");
 	ad.classList.add("ad", "exchange-item");
 	
 	let title = document.createElement("h1");
@@ -409,9 +434,14 @@ function generateAds() {
 	adImg.setAttribute("src", "testAd.png");
 	let text = document.createElement("p");
 	text.innerHTML = "MariahCoin to the moon.";
+	// ad.innerHTML = '<ins class="adsbycontextcue" data-cc-site="3be5690f-465e-4fe1-90eb-8e23b5a2216c" data-cc-slot="yn4LwZ0aL" style="width:300px;height:250px;"></ins>';
+	// ad.innerHTML = '<ins class="adsbycontextcue" data-cc-site="3be5690f-465e-4fe1-90eb-8e23b5a2216c" data-cc-slot="9jWtVgXUz" style="width:300px;height:250px;"></ins>';
+	// ad.innerHTML = '<div id="container-727c14fa740149ed6c4d984df64bdcb8"></div>';
+	// ad.innerHTML = '<scr' + 'ipt type="text/javascript" src="http' + (location.protocol === 'https:' ? 's' : '') + '://www.effectivedisplayformat.com/f87a01fb9d81d4a56680550f54cdd8db/invoke.js"></scr' + 'ipt>';
+	// ad.innerHTML = 	  "<script>atOptions = {'key' : 'f87a01fb9d81d4a56680550f54cdd8db','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};\n</script>" + document.write('<scr' + 'ipt type="text/javascript" src="http' + (location.protocol === 'https:' ? 's' : '') + '://www.effectivedisplayformat.com/f87a01fb9d81d4a56680550f54cdd8db/invoke.js"></scr' + 'ipt>');
+	// ad.appendChild(adImg);
+	// ad.appendChild(text);
 	
-	ad.appendChild(adImg);
-	ad.appendChild(text);
 	
 	return ad
 }
@@ -479,4 +509,23 @@ if (supportsMasonry) {
 		itemSelector: '.exchange-item',
 		fitWidth: true
 	});
+}
+
+let adCheck = document.querySelector(".aa_container");
+if (adCheck == null) {
+	ad = document.getElementById("aa-ad");
+	ad.innerHTML = "";
+	ad.style.visibility = "hidden";
+}
+
+// if (navigator.brave && await navigator.brave.isBrave() || false) {
+// 	console.log("brave")
+// }
+
+if (navigator.brave !== undefined) {
+	list = document.querySelector(".fallback-list");
+	li = document.createElement("li")
+	li.classList.add("brave");
+	li.innerHTML = "Send me a tip with Brave Rewards"
+	list.appendChild(li);
 }

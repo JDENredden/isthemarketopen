@@ -232,6 +232,11 @@ li iframe {
 	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
 }
 
+.center-ad {
+	/* margin: 0 auto; */
+	text-align: center;
+}
+
 li .fallback {
 	/* position: absolute; */
 	z-index: 1;

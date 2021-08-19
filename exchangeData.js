@@ -2,6 +2,7 @@ var exchanges = {
 	"nyse" : {
 		"nameLong" : "New York Stock Exchange",
 		"nameShort" : "NYSE",
+		"mic" : "XYNS",
 		"timeZone" : "America/New_York",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -28,6 +29,7 @@ var exchanges = {
 	"nasdaq" : {
 		"nameLong" : "Nasdaq Stock Exchange",
 		"nameShort" : "Nasdaq",
+		"mic" : "XNAS",
 		"timeZone" : "America/New_York",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -54,8 +56,8 @@ var exchanges = {
 	"lse" : {
 		"nameLong" : "London Stock Exchange",
 		"nameShort" : "LSE",
+		"mic" : "XLON",
 		"timeZone" : "Europe/London",
-		"emoji" : ":flag-gb:",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
 			"pre" : {
@@ -93,6 +95,7 @@ var exchanges = {
 	"hkse" : {
 		"nameLong" : "Hong Kong Stock Exchange",
 		"nameShort" : "HKEX",
+		"mic" : "XHKG",
 		"timeZone" : "Asia/Hong_Kong",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -131,6 +134,7 @@ var exchanges = {
 	"asx" : {
 		"nameLong" : "Australian Stock Exchange",
 		"nameShort" : "ASX",
+		"mic" : "XASX",
 		"timeZone" : "Australia/Sydney",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -166,9 +170,10 @@ var exchanges = {
 			}
 		}
 	},
-	"jse" : {
+	"jsx" : {
 		"nameLong" : "Tokyo Stock Exchange",
 		"nameShort" : "JPX",
+		"mic" : "XTKS",
 		"timeZone" : "Asia/Tokyo",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -195,6 +200,7 @@ var exchanges = {
 	"tsx" : {
 		"nameLong" : "Toronto Stock Exchange",
 		"nameShort" : "TSX",
+		"mic" : "XTSE",
 		"timeZone" : "America/Toronto",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -215,6 +221,7 @@ var exchanges = {
 	"epa" : {
 		"nameLong" : "Euronext Paris",
 		"nameShort" : "EPA",
+		"mic" : "XPAR",
 		"timeZone" : "Europe/Paris",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -232,9 +239,10 @@ var exchanges = {
 			}
 		}
 	},
-	"nze" : {
+	"nzx" : {
 		"nameLong" : "New Zealand Stock Exchange",
-		"nameShort" : "NZE",
+		"nameShort" : "NZX",
+		"mic" : "XNZX",
 		"timeZone" : "Pacific/Auckland",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -249,6 +257,7 @@ var exchanges = {
 	"six" : {
 		"nameLong" : "Swiss Stock Exchange",
 		"nameShort" : "SIX",
+		"mic" : "XSWX",
 		"timeZone" : "Europe/Zurich",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -269,6 +278,7 @@ var exchanges = {
 	"btc" : {
 		"nameLong" : "Bitcoin Exchanges",
 		"nameShort" : "BTC",
+		"mic" : "N/A",
 		"timeZone" : "Etc/UTC",
 		"openDays" : [1, 2, 3, 4, 5, 6, 7],
 		"sessions" : {
@@ -283,6 +293,7 @@ var exchanges = {
 	"lme" : {
 		"nameLong" : "London Metal Exchange",
 		"nameShort" : "LME",
+		"mic" : "XLME",
 		"timeZone" : "Europe/London",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -339,6 +350,7 @@ var exchanges = {
 	"cme" : {
 		"nameLong" : "Chicago Mercantile Exchange",
 		"nameShort" : "CME GLOBEX",
+		"mic" : "XCME",
 		"timeZone" : "America/Chicago",
 		"openDays" : [2, 3, 4, 5, 6, 7],
 		"sessions" : {
@@ -359,6 +371,7 @@ var exchanges = {
 	"aex" : {
 		"nameLong" : "Euronext Amsterdam",
 		"nameShort" : "AEX",
+		"mic" : "XAMS",
 		"timeZone" : "Europe/Amsterdam",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -379,6 +392,7 @@ var exchanges = {
 	"mta" : {
 		"nameLong" : "Borsa Italiana",
 		"nameShort" : "MTA",
+		"mic" : "XMIL",
 		"timeZone" : "Europe/Rome",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -411,6 +425,7 @@ var exchanges = {
 	"jse" : {
 		"nameLong" : "Johannesburg Stock Exchange",
 		"nameShort" : "JSE",
+		"mic" : "XJSE",
 		"timeZone" : "Africa/Johannesburg",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
@@ -425,6 +440,7 @@ var exchanges = {
 	"tadawul" : {
 		"nameLong" : "Saudi Stock Exchange",
 		"nameShort" : "Tadawul",
+		"mic" : "XSAU",
 		"timeZone" : "Asia/Riyadh",
 		"openDays" : [7, 1, 2, 3, 4],
 		"sessions" : {
@@ -433,6 +449,131 @@ var exchanges = {
 				"openHour" : 10,
 				"openMinute" : 0,
 				"duration" : 300
+			}
+		}
+	},
+	"SSE" : {
+		"nameLong" : "Shanghai Stock Exchange",
+		"nameShort" : "SSE",
+		"mic" : "XSHG",
+		"timeZone" : "Asia/Shanghai",
+		"openDays" : [1, 2, 3, 4, 5],
+		"sessions" : {
+			"pre" : {
+				"name" : "Opening",
+				"openHour" : 9,
+				"openMinute" : 15,
+				"duration" : 10
+			},
+			"core" : {
+				"name" : "Morning",
+				"openHour" : 9,
+				"openMinute" : 30,
+				"duration" : 120
+			},
+			"lunch" : {
+				"name" : "Lunch",
+				"openHour" : 11,
+				"openMinute" : 30,
+				"duration" : 90
+			},
+			"core2" : {
+				"name" : "Afternoon",
+				"openHour" : 13,
+				"openMinute" : 0,
+				"duration" : 120
+			},
+			"after" : {
+				"name" : "Extended Hours",
+				"openHour" : 15,
+				"openMinute" : 0,
+				"duration" : 60
+			},
+			"after2" : {
+				"name" : "Closing Call Auction",
+				"openHour" : 14,
+				"openMinute" : 57,
+				"duration" : 3
+			},
+			"after3" : {
+				"name" : "After Hours Fixed Priced Trading (SSE STAR)",
+				"openHour" : 15,
+				"openMinute" : 05,
+				"duration" : 25
+			}
+		}
+	},
+	"SZSE" : {
+		"nameLong" : "Shenzhen Stock Exchange",
+		"nameShort" : "SZSE",
+		"mic" : "XSHE",
+		"timeZone" : "Asia/Shanghai",
+		"city" : "Shenzhen",
+		"openDays" : [1, 2, 3, 4, 5],
+		"sessions" : {
+			"pre" : {
+				"name" : "Opening",
+				"openHour" : 9,
+				"openMinute" : 15,
+				"duration" : 10
+			},
+			"core" : {
+				"name" : "Morning",
+				"openHour" : 9,
+				"openMinute" : 30,
+				"duration" : 120
+			},
+			"lunch" : {
+				"name" : "Lunch",
+				"openHour" : 11,
+				"openMinute" : 30,
+				"duration" : 90
+			},
+			"core2" : {
+				"name" : "Afternoon",
+				"openHour" : 13,
+				"openMinute" : 0,
+				"duration" : 117
+			},
+			"after" : {
+				"name" : "Closing Call Auction",
+				"openHour" : 14,
+				"openMinute" : 57,
+				"duration" : 3
+			}
+		}
+	},
+	"BSE" : {
+		"nameLong" : "Bombay Stock Exchange",
+		"nameShort" : "BSE",
+		"mic" : "XBOM",
+		"timeZone" : "Asia/Kolkata",
+		"city" : "Mumbai",
+		"openDays" : [1, 2, 3, 4, 5],
+		"sessions" : {
+			"pre" : {
+				"name" : "Pre-Open",
+				"openHour" : 9,
+				"openMinute" : 0,
+				"duration" : 15
+			},
+			"core" : {
+				"name" : "Continuous",
+				"openHour" : 9,
+				"openMinute" : 15,
+				"duration" : 375
+			},
+			"after" : {
+				"name" : "Closing",
+				"openHour" : 15,
+				"openMinute" : 30,
+				"duration" : 10
+			},
+			"after2" : {
+				"name" : "Post-Close",
+				"openHour" : 15,
+				"openMinute" : 40,
+				"duration" : 20
 			}
 		}
 	}

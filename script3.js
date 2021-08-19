@@ -62,7 +62,7 @@ function whatSessionIsOpen(exchange, time) {
 function createTableData(exchange, time, daysTilNextOpen) {
 	let tableData = [];
 	let data = Object.keys(exchange.sessions);
-	let formatting = "hh':'mm''a";
+	let formatting = "hh':'mm' 'a";
 	
 	let openSessions = whatSessionIsOpen(exchange, time);
 	let todayIsTradingDay = isThisDayATradingDay(exchange, time);
@@ -212,7 +212,7 @@ function getDaysTilNextOpen(exchange, time) {
 }
 
 function generateListElement(exchange, time, tableData) {
-	let formatting = "hh':'mm' 'a"
+	let formatting = "hh':'mm' 'a";
 	let exchangeOpen = isExchangeOpen(exchange, time);
 	
 	switch (exchangeOpen) {
@@ -312,11 +312,14 @@ function generateListElement(exchange, time, tableData) {
 	const localCountry = ct.getCountryForTimezone(localTime.zoneName);
 	referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks in " + localCountry.name;
 	
-	timeTag.innerHTML = time.toFormat("cccc, L LLLL y");
+	timeTag.innerHTML = time.toFormat("cccc, d LLLL y");
 	if (exchange.nameShort == "BTC") {
-		title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " + exchange.nameLong + " (" + exchange.nameShort + ") " + "<time>" + time.toFormat("h':'mm''a").toLowerCase() + "</time>" ;
+		// title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " + exchange.nameLong + " (" + exchange.nameShort + ") " + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
+		title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " + exchange.nameLong + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>";
+
 	} else {
-		title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(time.zoneName).id).emoji + " " + exchange.nameLong + " (" + exchange.nameShort.split(" ")[0] + ") " + "<time>" + time.toFormat("h':'mm''a").toLowerCase() + "</time>" ;
+		// title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(time.zoneName).id).emoji + " " + exchange.nameLong + " (" + exchange.nameShort.split(" ")[0] + ") " + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>";
+		title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(time.zoneName).id).emoji + " " + exchange.nameLong + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>";
 	}
 	subHead.innerHTML = "The " + exchange.nameShort + " is "+ exchangeOpenString + " for regular trading.";
 	differenceInOffset = time.offset - localTime.offset;
@@ -334,9 +337,17 @@ function generateListElement(exchange, time, tableData) {
 		"<li><b>Timezone</b> " + time.toFormat("ZZZZZ") + " (UTC" + time.toFormat("ZZ") + ") " + "</li>" +
 		"<li><b>Offset</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>"
 		;
+	} else if (exchange.city) {
+		text.innerHTML = "<li><b>Trading week</b> " + openDaysString[0] + " - " + openDaysString[1] + "</li>" +
+		"<li><b>Location</b> " + exchange.city + ", " + ct.getCountryForTimezone(time.zoneName).name  + "</li>" + 
+		"<li><b>MIC code</b> " + exchange.mic + "</li>" +
+		"<li><b>Timezone</b> " + time.toFormat("ZZZZZ") + " (UTC" + time.toFormat("ZZ") + ") " + "</li>" +
+		"<li><b>Offset</b> " + exchange.city  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>"
+		;
 	} else {
 		text.innerHTML = "<li><b>Trading week</b> " + openDaysString[0] + " - " + openDaysString[1] + "</li>" +
 		"<li><b>Location</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ') + ", " + ct.getCountryForTimezone(time.zoneName).name  + "</li>" +
+		"<li><b>MIC code</b> " + exchange.mic + "</li>" +
 		"<li><b>Timezone</b> " + time.toFormat("ZZZZZ") + " (UTC" + time.toFormat("ZZ") + ") " + "</li>" +
 		"<li><b>Offset</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>"
 		;	
@@ -516,6 +527,8 @@ if (adCheck == null) {
 	ad = document.getElementById("aa-ad");
 	ad.innerHTML = "";
 	ad.style.visibility = "hidden";
+	centerAd = document.querySelector(".center-ad");
+	centerAd.remove();
 }
 
 // if (navigator.brave && await navigator.brave.isBrave() || false) {

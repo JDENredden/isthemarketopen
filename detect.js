@@ -60,24 +60,24 @@
 // 	console.error('There has been a problem with your fetch operation:', error);
 //   });
 
-async function detectAdBlock() {
-	  let adBlockEnabled = false
-	  const googleAdUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
-	  // const googleAdUrl = 'https://whendoesthemarketopen.com/script3.js';
-	  try {
-		await fetch(new Request(
-			googleAdUrl, {
-				method: 'HEAD',
-				mode: 'no-cors'
-			}))
-			.catch(_ => adBlockEnabled = true)
-	  } catch (e) {
-		adBlockEnabled = true
-	  } finally {
-		console.log(`AdBlock Enabled: ${adBlockEnabled}`)
-	  }
-	}
-	detectAdBlock();
+// async function detectAdBlock() {
+// 	  let adBlockEnabled = false
+// 	  const googleAdUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+// 	  // const googleAdUrl = 'https://whendoesthemarketopen.com/script3.js';
+// 	  try {
+// 		await fetch(new Request(
+// 			googleAdUrl, {
+// 				method: 'HEAD',
+// 				mode: 'no-cors'
+// 			}))
+// 			.catch(_ => adBlockEnabled = true)
+// 	  } catch (e) {
+// 		adBlockEnabled = true
+// 	  } finally {
+// 		console.log(`AdBlock Enabled: ${adBlockEnabled}`)
+// 	  }
+// 	}
+// 	detectAdBlock();
 
 // async function checkAdBlock() {
 // 	fetch(

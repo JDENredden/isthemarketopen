@@ -214,6 +214,7 @@ function getDaysTilNextOpen(exchange, time) {
 function generateListElement(exchange, time, tableData) {
 	let formatting = "hh':'mm' 'a";
 	let exchangeOpen = isExchangeOpen(exchange, time);
+	let daysTilNextOpen = getDaysTilNextOpen(exchange, time);
 	
 	switch (exchangeOpen) {
 		case true:
@@ -230,20 +231,24 @@ function generateListElement(exchange, time, tableData) {
 	});
 	
 	//Testing
-	// if (exchange.nameShort == "CME GLOBEX") {
-	// 	console.log("Time: " + time.weekday)
-	// 	console.log("Open: " + coreOpen.weekday);
-	// 	console.log("Close: " + coreOpen.plus({ minute: exchange.sessions.core.duration }).weekday);
-	// 	// console.log(coreOpen.diff(time));
-	// 	// console.log(time.diff(coreOpen));
-	// 	daySessionOpened = time.plus(time.diff(coreOpen));
-	// 	console.log("day session opened: " + daySessionOpened.weekday)
-	// }
+	if (exchange.nameShort == "CME GLOBEX") {
+		console.log("Time: " + time.weekday)
+		console.log("Open: " + coreOpen.weekday);
+		console.log("Close: " + coreOpen.plus({ minute: exchange.sessions.core.duration }).weekday);
+		// console.log(coreOpen.diff(time));
+		// console.log(time.diff(coreOpen));
+		daySessionOpened = time.plus(time.diff(coreOpen));
+		console.log("day session opened: " + daySessionOpened.weekday)
+	}
 	
 	// If the session opened yesterday
-	if (time.plus(time.diff(coreOpen)).weekday < time.weekday) {
-		coreOpen = coreOpen.plus({ days: -1 });
-	}
+	// if (time.plus(time.diff(coreOpen)).weekday < time.weekday) {
+	// if (coreOpen.plus(coreOpen.diff(time)).weekday - time.weekday > 0) {
+	// 	coreOpen = coreOpen.plus({ days: -1 });
+	// } 
+	// else if (coreClose.weekday - time.weekday < 0) {
+	// 	coreClose = coreClose.plus({days: -1});
+	// }
 	
 	if (exchange.sessions.core2) {
 		coreOpen = time.set({ 
@@ -257,9 +262,9 @@ function generateListElement(exchange, time, tableData) {
 	} 
 	
 	// If session closes the day after it opened.
-	if (coreClose.weekday - time.weekday < 0) {
-		coreClose = coreClose.plus({days: -1});
-	}
+	// if (coreClose.weekday - time.weekday < 0) {
+	// 	coreClose = coreClose.plus({days: -1});
+	// }
 	
 	let coreOpenString = coreOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + coreClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
 	
@@ -402,6 +407,8 @@ function generateListElement(exchange, time, tableData) {
 		status = "closed";
 		if (time.diff(coreClose) > 0 && todayIsTradingDay) {
 			countdown.innerHTML = "Closed " + coreClose.toRelative( { unit: ["hours", "minutes"]});
+		// } else if (daysTilNextOpen == 0 ) {
+		// 	countdown.innerHTML = "Opening " + coreOpen.toRelative( { unit: ["hours", "minutes"]});
 		} else {
 			countdown.innerHTML = "Opening " + coreOpen.plus({days: daysTilNextOpen}).toRelative( { unit: ["hours", "minutes"]});   
 		}
@@ -430,7 +437,7 @@ function generateListElement(exchange, time, tableData) {
 	li.appendChild(text);
 	// container.appendChild(li);
 	li.appendChild(referral);
-	
+
 	return [li, table]
 }
 
@@ -439,12 +446,12 @@ function generateAds() {
 	document.getElementById("ad");
 	ad.classList.add("ad", "exchange-item");
 	
-	let title = document.createElement("h1");
-	title.innerHTML = "Ad";
-	let adImg = document.createElement("img");
-	adImg.setAttribute("src", "testAd.png");
-	let text = document.createElement("p");
-	text.innerHTML = "MariahCoin to the moon.";
+	// let title = document.createElement("h1");
+	// title.innerHTML = "Ad";
+	// let adImg = document.createElement("img");
+	// adImg.setAttribute("src", "testAd.png");
+	// let text = document.createElement("p");
+	// text.innerHTML = "MariahCoin to the moon.";
 	// ad.innerHTML = '<ins class="adsbycontextcue" data-cc-site="3be5690f-465e-4fe1-90eb-8e23b5a2216c" data-cc-slot="yn4LwZ0aL" style="width:300px;height:250px;"></ins>';
 	// ad.innerHTML = '<ins class="adsbycontextcue" data-cc-site="3be5690f-465e-4fe1-90eb-8e23b5a2216c" data-cc-slot="9jWtVgXUz" style="width:300px;height:250px;"></ins>';
 	// ad.innerHTML = '<div id="container-727c14fa740149ed6c4d984df64bdcb8"></div>';
@@ -496,44 +503,128 @@ for (key of exchangeData) {
 
 ad = generateAds();
 
+ad2 = document.getElementById("ad2");
+ad2.classList.add("ad", "exchange-item");
+ad3= document.getElementById("ad3");
+ad3.classList.add("ad", "exchange-item");
+
 container.appendChild(openExchanges);
 container.appendChild(extendedOpenExchanges);
 container.appendChild(closedExchanges);
 
 adLocation = Math.floor(Math.random() * container.childNodes.length);
-adLocation2 = Math.floor(Math.random() * container.childNodes[adLocation].childNodes.length);
+// adLocation2 = Math.floor(Math.random() * container.childNodes[adLocation].childNodes.length);
+adLocation0 = Math.floor(Math.random() * container.childNodes[0].childNodes.length - 1);
+adLocation1 = Math.floor(Math.random() * container.childNodes[1].childNodes.length - 1);
+adLocation2 = Math.floor(Math.random() * container.childNodes[2].childNodes.length - 1);
 // container.childNodes[adLocation].childNodes[adLocation2].insertNode(ad);
-container.childNodes[adLocation].insertBefore(ad, container.childNodes[adLocation].childNodes[adLocation2 + 1]);
+container.childNodes[0].insertBefore(ad, container.childNodes[0].childNodes[adLocation0 + 1]);
+container.childNodes[1].insertBefore(ad2, container.childNodes[1].childNodes[adLocation1]);
+container.childNodes[2].insertBefore(ad3, container.childNodes[2].childNodes[adLocation2 + 1]);
 
 
 document.getElementById("browserTimezone").innerHTML = localTime.zoneName;
 document.getElementById("detectedLocation").innerHTML = localTime.zoneName.split("/")[1] + ", " + ct.getCountryForTimezone(localTime.zoneName).name;
 
-const supportsMasonry = CSS.supports('grid-template-rows', 'masonry');
+// const supportsMasonry = CSS.supports('grid-template-rows', 'masonry');
+// 
+// if (supportsMasonry) {
+// 	console.log('Native masonry is supported, do nothing');
+// } else {
+// 	const elem = document.querySelector('.masonry');
+// 	const msnry = new Masonry(elem, {
+// 		// options
+// 		itemSelector: '.exchange-item',
+// 		fitWidth: true
+// 	});
+// }
 
-if (supportsMasonry) {
-	console.log('Native masonry is supported, do nothing');
-} else {
+
+function masonry() {
 	const elem = document.querySelector('.masonry');
 	const msnry = new Masonry(elem, {
 		// options
 		itemSelector: '.exchange-item',
 		fitWidth: true
-	});
+	});	
 }
 
-let adCheck = document.querySelector(".aa_container");
-if (adCheck == null) {
-	ad = document.getElementById("aa-ad");
-	ad.innerHTML = "";
-	ad.style.visibility = "hidden";
-	centerAd = document.querySelector(".center-ad");
-	centerAd.remove();
-}
+async function detectAdBlock() {
+		  let adBlockEnabled = false
+		  // const AdUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+		  const AdUrl = 'https://pl16507235.highperformancecpm.com/727c14fa740149ed6c4d984df64bdcb8/invoke.js';
+		  // const googleAdUrl = 'https://whendoesthemarketopen.com/script3.js';
+		  try {
+			await fetch(new Request(
+				AdUrl, {
+					method: 'HEAD',
+					mode: 'no-cors'
+				}))
+				.catch(_ => adBlockEnabled = true)
+		  } catch (e) {
+			adBlockEnabled = true
+		  } finally {
+			console.log(`AdBlock Enabled: ${adBlockEnabled}`)
+		  }
+		  return adBlockEnabled;
+		}
 
+detectAdBlock().then(function(adBlockEnabled) {
+	console.log(adBlockEnabled)
+		if (adBlockEnabled) {
+				ad = document.querySelectorAll(".ads");
+				ad.forEach((ad) => {
+					ad.innerHTML = "";
+					ad.style.visibility = "hidden";
+					ad.remove();
+				});
+				console.log("blocked");
+				masonry();
+			} else {
+				fallback = document.querySelectorAll(".fallback-content");
+				fallback.forEach((ad) => {
+					ad.innerHTML = "";
+					ad.style.visibility = "hidden";
+					ad.remove();
+				});
+				console.log("not blocked")
+				masonry();
+			}
+})
+
+// justDetectAdblock.detectAnyAdblocker().then(function(detected) {
+// 	if (detected) {
+// 		ad = document.querySelectorAll(".ads");
+// 		ad.forEach((ad) => {
+// 			ad.innerHTML = "";
+// 			ad.style.visibility = "hidden";
+// 			ad.remove();
+// 		});
+// 		console.log("blocked");
+// 	} else {
+// 		fallback = document.querySelectorAll(".fallback-content");
+// 		fallback.forEach((ad) => {
+// 			ad.innerHTML = "";
+// 			ad.style.visibility = "hidden";
+// 			ad.remove();
+// 		});
+// 		console.log("not blocked");
+// 	}
+// })
+
+
+// window.addEventListener("load", adCheck());
+// adCheck();
 // if (navigator.brave && await navigator.brave.isBrave() || false) {
 // 	console.log("brave")
 // }
+
+// const elem = document.querySelector('.masonry');
+// const msnry = new Masonry(elem, {
+// 	// options
+// 	itemSelector: '.exchange-item',
+// 	fitWidth: true
+// });	
 
 if (navigator.brave !== undefined) {
 	list = document.querySelector(".fallback-list");
@@ -542,3 +633,15 @@ if (navigator.brave !== undefined) {
 	li.innerHTML = "Send me a tip with Brave Rewards"
 	list.appendChild(li);
 }
+
+
+
+// window.addEventListener("load", function() {
+window.addEventListener("DOMContentLoaded", function() {
+	const elem = document.querySelector('.masonry');
+	const msnry = new Masonry(elem, {
+		// options
+		itemSelector: '.exchange-item',
+		fitWidth: true
+	});	
+})

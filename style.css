@@ -222,7 +222,7 @@ ul.exchange-list > li.closed {
 }
 
 ul.exchange-list > li.open {
-	background: #76b852;  /* fallback for old browsers */
+	background: #76b852;  /* fallback-300 for old browsers */
 	/* background: linear-gradient(to bottom, #8DC26F, #76b852); */
 	background: linear-gradient(#69d979, #28c941);
 }
@@ -230,8 +230,16 @@ ul.exchange-list > li.open {
 ul.exchange-list > li.ad {
 	background: linear-gradient(rgb(196, 181, 253), rgb(167, 139, 250));
 	text-align: center;
-	height: calc(286px + 2em);
+	height: calc(300px + 2em);
+	display: table;
 }
+
+/* ul.exchange-list > li.ad {
+	background: linear-gradient(rgb(196, 181, 253), rgb(167, 139, 250));
+	text-align: center;
+	height: calc(295px + 2em);
+	z-index: 0;
+} */
 
 .aa_container, .aa_logo {
 	background-color: transparent;
@@ -247,60 +255,126 @@ ul.exchange-list > li.ad {
 
 li iframe {
 	border: 3px solid white;
-	margin-top: 1em;
+	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
+	z-index: 1;
+	border-radius: 1em;
+}
+
+.ad-caption, .fallback-caption {
+	font-size: smaller;
+	text-align: right;
+	margin: 0 auto;
+	/* width: 336px; */
+	height: 15px;
+	padding-top: 2px;
+	/* padding-right: 2em; */
+	font-style: italic;
+}
+
+.native-ad {
+	border: 3px solid white;
+	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
+	border-radius: 1em;
+	background-color: rgb(196, 181, 253);
+}
+
+.native-ad + .ad-caption {
+	padding-right: 1em;
+	margin-top: 0.3em;
+}
+
+.box-ad-336 + .ad-caption {
+	width: 336px;
+	padding-right: 1em;
+	margin: 0 auto;
+}
+
+/* .box-ad-300 {
+	width: 300px;
+} */
+
+.box-ad-300 + .ad-caption, .fallback-content .fallback-caption {
+	width: 300px;
+	padding-right: 1em;
+	margin: 0 auto;
+}
+
+.center-top {
+	margin: 0 auto;
+	text-align: center;
+	width: min-content;
+}
+
+.center-top .ad-caption, .center-top .fallback-caption {
+	padding-right: 1em;
+	width: 728px;
+	margin: 0 auto;
+	padding-top: 0;
+}
+
+.center-top img, .center-top iframe {
+	border-radius: 0 0 1em 1em;
+	border: 3px solid #6C0702;
+	border-top: 0;
 	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
 }
 
-.center-ad {
-	/* margin: 0 auto; */
-	text-align: center;
-}
-
-li .fallback {
-	position: relative;
+li .fallback-300 {
+	/* position: relative; */
 	display: table;
-	z-index: -1;
 	margin: 0 auto;
-	margin-top: -290px;
-	width:336px;
-	height:280px;
+	/* margin-top: -256px; */
+	/* width:300px; */
+	height:250px;
 	text-align: justify;
 	/* padding: 1em; */
 	border: 3px solid white;
 	border-radius: 1em;
 	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
-	background: rgba(0, 0, 0, 0.1);
+	/* background: rgba(0, 0, 0, 0.1); */
+	background-color: rgb(196, 181, 253);
+	z-index: 1;
 }
 
-.content {
+/* .content {
+	display: table-cell;
+	vertical-align: middle;
+	padding-top: 15px;
+} */
+
+.fallback-content, .ad-content, .center-content {
 	display: table-cell;
 	vertical-align: middle;
 }
 
-.fallback h2, .fallback h3 {
+.with-caption, .ad-content {
+	padding-top: 17px;
+}
+
+.fallback-300 h2, .fallback-300 h3 {
 	text-align: center;
 }
 
-.fallback h2 {
+.fallback-300 h2 {
 	margin-top: 0;
 }
 
-.fallback ul {
+.fallback-300 ul {
 	list-style-type: circle;
 }
 
-li .fallback p {
+li .fallback-300 p {
 	padding: 0 1.5em;
 	margin: 0;
 	margin-top: 1em;
 }
 
-li .fallback ul {
+li .fallback-300 ul {
 	padding-right: 1.5em;
 	margin-top: 1em;
 }
 
-li .fallback li {
+li .fallback-300 li {
 }
 
 /* ul.exchange-list > li.ad img {
@@ -371,7 +445,7 @@ table {
 
 /* table.open tr th, table.open tr td { */
 table.open {
-	/* background: #76b852;  /* fallback for old browsers */ */
+	/* background: #76b852;  /* fallback-300 for old browsers */ */
 	/* background: -webkit-linear-gradient(to top, #8DC26F, #76b852);  /* Chrome 10-25, Safari 5.1-6 */ */
 	/* background: linear-gradient(to top, #8DC26F, #76b852); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */ 
 	/* background-clip: padding-box; */
@@ -469,3 +543,16 @@ table tr:last-child td:last-child {
 	background-clip: padding-box;
 }
 
+footer {
+	width: 728px;
+	margin: 2em auto;
+}
+
+footer iframe {
+	border-radius: 1em;
+	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
+}
+
+footer .ad-caption {
+	padding-right: 1em;
+}

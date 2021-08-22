@@ -227,11 +227,22 @@ ul.exchange-list > li.open {
 	background: linear-gradient(#69d979, #28c941);
 }
 
+
+
 ul.exchange-list > li.ad {
 	background: linear-gradient(rgb(196, 181, 253), rgb(167, 139, 250));
 	text-align: center;
 	height: calc(300px + 2em);
+	/* padding: 0 5em; */
 	display: table;
+	width: 42em;
+}
+
+li.ad {
+	/* max-width: 42em !important; */
+	/* width: 42em !important; */
+	/* margin: 1em; */
+	display: none;
 }
 
 /* ul.exchange-list > li.ad {
@@ -253,6 +264,16 @@ ul.exchange-list > li.ad {
 	border-color: white !important;
 }
 
+.ad-content, .fallback-content {
+	visibility: hidden;
+	/* display: none; */
+	/* width: 1em !important; */
+}
+
+.fallback-content {
+	/* top: 300px; */
+}
+
 li iframe {
 	border: 3px solid white;
 	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
@@ -266,9 +287,12 @@ li iframe {
 	margin: 0 auto;
 	/* width: 336px; */
 	height: 15px;
-	padding-top: 2px;
 	/* padding-right: 2em; */
 	font-style: italic;
+}
+
+.fallback-caption {
+	padding-top: 2px;
 }
 
 .native-ad {
@@ -293,28 +317,28 @@ li iframe {
 	width: 300px;
 } */
 
-.box-ad-300 + .ad-caption, .fallback-content .fallback-caption {
+.ad-caption, .fallback-content .fallback-caption {
 	width: 300px;
 	padding-right: 1em;
 	margin: 0 auto;
 }
 
-.center-top {
+.center {
 	margin: 0 auto;
 	text-align: center;
 	width: min-content;
 }
 
-.center-top .ad-caption, .center-top .fallback-caption {
+.center .ad-caption, .center .fallback-caption {
 	padding-right: 1em;
 	width: 728px;
 	margin: 0 auto;
 	padding-top: 0;
 }
 
-.center-top img, .center-top iframe {
+.center img, .center iframe {
 	border-radius: 0 0 1em 1em;
-	border: 3px solid #6C0702;
+	/* border: 3px solid #6C0702; */
 	border-top: 0;
 	box-shadow: 0 0.25em 1em rgba(30, 30, 30, 0.15);
 }
@@ -342,13 +366,17 @@ li .fallback-300 {
 	padding-top: 15px;
 } */
 
-.fallback-content, .ad-content, .center-content {
+.fallback-content, .ad-content {
 	display: table-cell;
 	vertical-align: middle;
 }
 
 .with-caption, .ad-content {
 	padding-top: 17px;
+}
+
+.center-ad {
+	padding: 0;
 }
 
 .fallback-300 h2, .fallback-300 h3 {

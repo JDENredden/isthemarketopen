@@ -326,7 +326,7 @@ li iframe {
 .center {
 	margin: 0 auto;
 	text-align: center;
-	width: min-content;
+	width: 728px;
 }
 
 .center .ad-caption, .center .fallback-caption {

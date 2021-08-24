@@ -349,7 +349,12 @@ function generateListElement(exchange, time, tableData) {
 	
 	let referral = document.createElement("p");
 	const localCountry = ct.getCountryForTimezone(localTime.zoneName);
-	referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks in " + localCountry.name;
+	if (exchange.nameShort == "BTC") {
+		referral.style.textAlign = "center";
+		referral.innerHTML = '<a href="https://med.etoro.com/B9459_A109752_TClick.aspx" Target="_Top"><img border="0" src="images/etoro/etoro_crypto_wide.gif" alt=" " style="border:3px solid white; border-radius:1em; overflow:hidden;" width="468" height="60" /></a>';
+	} else {
+		referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks in " + localCountry.name;
+	}
 	
 	timeTag.innerHTML = time.toFormat("cccc, d LLLL y");
 	if (exchange.nameShort == "BTC") {
@@ -374,8 +379,7 @@ function generateListElement(exchange, time, tableData) {
 		text.innerHTML = "<li><b>Trading week</b> " + openDaysString[0] + " - " + openDaysString[1] + "</li>" +
 		"<li><b>Location</b> Global</li>" +
 		"<li><b>Timezone</b> " + time.toFormat("ZZZZZ") + " (UTC" + time.toFormat("ZZ") + ") " + "</li>" +
-		"<li><b>Offset</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>"
-		;
+		"<li><b>Offset</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>";
 	} else if (exchange.city) {
 		text.innerHTML = "<li><b>Trading week</b> " + openDaysString[0] + " - " + openDaysString[1] + "</li>" +
 		"<li><b>Location</b> " + exchange.city + ", " + ct.getCountryForTimezone(time.zoneName).name  + "</li>" + 
@@ -416,8 +420,12 @@ function generateListElement(exchange, time, tableData) {
 			countdown.innerHTML = "Closing " + coreClose.toRelative( { unit: ["hours", "minutes"]} );
 		}
 	} else if (currentSessions[0].name != "Closed") { // Extended open
-		if (time > currentSessionOpenTime) { // Pre-open
+		// if (time > currentSessionOpenTime) { // Pre-open
+			if (time < coreClose) {
 			countdown.innerHTML = "Opening " + coreOpen.toRelative( { unit: ["hours", "minutes"]} );
+			if (exchange.nameShort == "ASX") {
+				console.log("yes")
+			}
 		} else if (currentSessions[0].name == "Lunch") {
 			countdown.innerHTML = "Re-opening " + currentSessionOpenTime.plus({ minutes: exchange.sessions.lunch.duration });
 		} else { // Extended hours 

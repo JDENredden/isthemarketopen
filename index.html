@@ -3,9 +3,12 @@
 
 <head>
   <title>When does the market open?</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8630450055576832" crossorigin="anonymous"></script>
   <!-- Fathom - beautiful, simple website analytics -->
   <script src="https://possum.whendoesthemarketopen.com/script.js" data-site="BGVXCAUM" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@2.0.1/build/global/luxon.min.js"></script>
+  <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/manuelmhtr/countries-and-timezones@latest/dist/index.js" type="text/javascript"></script>
+  <script src="https://unpkg.com/country-flag-emoji@latest/dist/country-flag-emoji.umd.min.js"></script>
   <!-- / Fathom -->
 </head>
 <link rel="stylesheet" href="style.css">
@@ -13,14 +16,33 @@
 
 <body>
   <article class="center">
+    <div id="test"></div>
     <div class="ad-content center-ad">
-      <iframe class="ads" data-aa="1746407" src="https://ad.a-ads.com/1746407?size=728x90" style="width:728px; height:90px; border:0; border-radius:0 0 1em 1em; padding:0; overflow:hidden; background-color: transparent; margin: 0 auto; text-align:center; position: relative;"></iframe>
-      <p class="ad-caption ads">Anonymous and private ads by <a href="https://a-ads.com/?partner=1746407">A-Ads</a>.</p>
+      <div class="ads" id="etoro-widget"></div>
+      <script type="text/javascript">
+          window['widgetSettings']={
+              feedType: 'cryptocurrency',
+              pageName: 'When Does the Market Open', // your site name/ other custom name (used for tracking)
+              container:'etoro-widget', // Container
+              culture: 'en-gb', //en-gb, de-de, fr-fr, es-es, ar-ae, it-it, sv-se, nl-nl, nb-no, da-dk
+              isEtoro: true,
+              clickTag: '',
+              w_size:'s_728x90',    // s_300X250 , s_300x600 , s_728x90 , s_970x90, s_970x250
+              etoroUrl: "https://med.etoro.com/B15356_A109752_TClick_ADVTrue.aspx"
+          }
+      </script>
+      <script src="iframe-creator.js" type="text/javascript"></script>
+      <p class="ad-caption ads">Invest global stocks with $0 commission with <a href="https://med.etoro.com/B15356_A109752_TClick.aspx">eToro</a>.</p>
+
+    </div>
+      
+      <!-- <iframe class="ads" data-aa="1746407" src="https://ad.a-ads.com/1746407?size=728x90" style="width:728px; height:90px; border:0; border-radius:0 0 1em 1em; padding:0; overflow:hidden; background-color: transparent; margin: 0 auto; text-align:center; position: relative;"></iframe> 
+    <p class="ad-caption ads">Anonymous and private ads by <a href="https://a-ads.com/?partner=1746407">A-Ads</a>.</p>-->
     </div>
     
     <div class="fallback-content">
-      <a href="https://nextdns.io/?from=uryha4np"><img src="images/nextdns_wide_reff.png" width="728px" height="90px"></a>
-      <p class="fallback-caption">Block ads and trackers at a DNS level with <a href="https://nextdns.io/?from=uryha4np">NextDNS</a>.</p>
+      <a href="https://med.etoro.com/B18131_A109752_TClick.aspx"><img src="images/etoro/etoro_stocks_wide.jpg" width="728px" height="90px"></a>
+      <p class="fallback-caption">Invest global stocks with $0 commission with <a href="https://med.etoro.com/B15356_A109752_TClick.aspx">eToro</a>.</p>
     </div>
   </article>
 
@@ -29,9 +51,9 @@
 
   <li id="ad" class="ad">
     <div class="ad-content">
-      <!-- <iframe id="aa-ad" class="ads" data-aa="1743823" src="https://ad.a-ads.com/1743823?size=300x250&background_color=transparent&text_color=ffffff&title_color=ffffff&title_hover_color=ffffff&link_color=ffffff&link_hover_color=ffffff" style="width:300px; height:250px; border:3px solid white; border-radius:1em 0 1em 1em; padding:0; overflow:hidden; background-color: rgb(196, 181, 253);"></iframe> -->
-      <!-- <p class="ad-caption ads">Anonymous and private ads by <a href="https://a-ads.com/?partner=1746407">A-Ads</a>.</p> -->
-      <div id="etoro-widget"></div>
+      <iframe id="aa-ad" class="ads" data-aa="1743823" src="https://ad.a-ads.com/1743823?size=300x250&background_color=transparent&text_color=ffffff&title_color=ffffff&title_hover_color=ffffff&link_color=ffffff&link_hover_color=ffffff" style="width:300px; height:250px; border:3px solid white; border-radius:1em 0 1em 1em; padding:0; overflow:hidden; background-color: rgb(196, 181, 253);"></iframe>
+      <p class="ad-caption ads">Anonymous and private ads by <a href="https://a-ads.com/?partner=1746407">A-Ads</a>.</p>
+      <!-- <div id="etoro-widget"></div>
       <script type="text/javascript">
           window[`widgetSettings`]={
               feedType:`cryptocurrency`,
@@ -45,7 +67,7 @@
           }
       </script>
   
-      <script src="https://pages.etoro.com/widgets/widget-redesign/stocks-list/iframe-creator.js" type="text/javascript"></script>
+      <script src="iframe-creator.js" type="text/javascript"></script> -->
     </div>
     <div class="fallback-content with-caption">
       <!-- <a href="https://a-ads.com/?partner=1746407"><img class="fallback-300" src="images/aads_reff.gif" width="300px" height="250px"></a> -->
@@ -116,15 +138,13 @@
 
 <script src="exchangeData.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/luxon@2.0.1/build/global/luxon.min.js"></script>
-<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/manuelmhtr/countries-and-timezones@latest/dist/index.js" type="text/javascript"></script>
-<script src="https://unpkg.com/country-flag-emoji@latest/dist/country-flag-emoji.umd.min.js"></script>
+
 
 <!-- <script src="https://cdn.jsdelivr.net/npm/macy@2"></script> -->
 <!-- <script src="script2.js"></script> -->
 <!-- <script src="bundle.umd.js"></script> -->
 <script src="script3.js"></script>
+<script defer src="money.js"></script>
 <!-- <script src="detect.js"></script> -->
 
 </html>

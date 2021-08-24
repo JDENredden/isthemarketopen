@@ -576,5 +576,50 @@ var exchanges = {
 				"duration" : 20
 			}
 		}
+	},
+	"FX" : {
+		"nameLong" : "Foreign Exchange Markets",
+		"nameShort" : "FX",
+		"mic" : "XBOM",
+		"timeZone" : "Etc/UTC",
+		// "city" : "Mumbai",
+		"openDays" : [1, 2, 3, 4, 5],
+		"sessions" : {
+			"core" : {
+				"name" : "Sydney",
+				"timeZone" : "Australia/Sydney",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			},
+			"core2" : {
+				"name" : "Tokyo",
+				"timeZone" : "Asia/Tokyo",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			},
+			"core3" : {
+				"name" : "Frankfurt",
+				"timeZone" : "Europe/Berlin",
+				"openHour" : 7,
+				"openMinute" : 0,
+				"duration" : 480
+			},
+			"core4" : {
+				"name" : "London",
+				"timeZone" : "Europe/London",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			},
+			"core5" : {
+				"name" : "New York",
+				"timeZone" : "America/New_York",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			}
+		}
 	}
 }

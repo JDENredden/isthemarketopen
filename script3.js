@@ -26,7 +26,13 @@ function whatSessionIsOpen(exchange, time) {
 	for (key of sessions) {
 		let session = exchange.sessions[key];
 		
-		let open = time.set({ 
+		if (exchange.nameShort == "FX") {
+			open = time.setZone(session.timeZone);
+		} else {
+			open = time;
+		}
+		
+		open = open.set({ 
 			hour: session.openHour, 
 			minute: session.openMinute, 
 			second: 0 
@@ -79,7 +85,36 @@ function createTableData(exchange, time, daysTilNextOpen) {
 	});
 	
 	if (exchange.sessions.core2) {
-		coreClose = coreOpen.plus({ minute: exchange.sessions.core2.duration });	
+		core2Open = time.set({ 
+			hour: exchange.sessions.core2.openHour, 
+			minute: exchange.sessions.core2.openMinute, 
+			second: 0 
+		});
+		coreClose = core2Open.plus({ minute: exchange.sessions.core2.duration });
+		if (exchange.sessions.core3) {
+			core3Open = time.set({ 
+				hour: exchange.sessions.core3.openHour, 
+				minute: exchange.sessions.core3.openMinute, 
+				second: 0 
+			});
+			coreClose = core3Open.plus({ minute: exchange.sessions.core3.duration });
+		}
+		if (exchange.sessions.core4) {
+			core4Open = time.set({ 
+				hour: exchange.sessions.core4.openHour, 
+				minute: exchange.sessions.core4.openMinute, 
+				second: 0 
+			});
+			coreClose = core3Open.plus({ minute: exchange.sessions.core4.duration });
+		}
+		if (exchange.sessions.core5) {
+			core5Open = time.set({ 
+				hour: exchange.sessions.core5.openHour, 
+				minute: exchange.sessions.core5.openMinute, 
+				second: 0 
+			});
+			coreClose = core5Open.plus({ minute: exchange.sessions.core5.duration });
+		}
 	} else {
 		coreClose = coreOpen.plus({ minute: exchange.sessions.core.duration });
 	}
@@ -87,7 +122,13 @@ function createTableData(exchange, time, daysTilNextOpen) {
 	for (key of data) {
 		let sessionData = {};
 		let session = exchange.sessions[key];
-		let sessionOpen = time.set({ 
+		if (exchange.nameShort == "FX") {
+			sessionOpen = time.setZone(session.timeZone);
+		} else {
+			sessionOpen = time;
+		}
+		
+		sessionOpen = sessionOpen.set({ 
 			hour: session.openHour, 
 			minute: session.openMinute, 
 			second: 0 
@@ -101,16 +142,39 @@ function createTableData(exchange, time, daysTilNextOpen) {
 		// 	console.log(todayIsTradingDay);
 		// }
 		
+		
+			if (exchange.nameShort == "FX") {
+				console.log(session.name);
+				console.log(sessionOpen.toFormat(formatting));
+				console.log(sessionOpen.setZone("Etc/UTC").toFormat(formatting));
+			}
+		
 		sessionData["className"] = key;
 		sessionData["Session"] = session.name;
-		sessionData["Exchange Time (" + buildAcronym(sessionOpen.toFormat("ZZZZZ")) + ")"] = sessionOpen.toFormat(formatting).toLowerCase() + " - " + sessionClose.toFormat(formatting).toLowerCase();
-		sessionData["Local Time (" + buildAcronym(localTime.toFormat("ZZZZZ")) + ")"] = sessionOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
+		
+		if (exchange.nameShort == "FX") {
+			sessionData["Exchange Time (UTC)"] = sessionOpen.setZone("Etc/UTC").toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone("Etc/UTC").toFormat(formatting).toLowerCase();
+			sessionData["Local Time (" + buildAcronym(localTime.toFormat("ZZZZZ")) + ")"] = sessionOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
+		} else {
+			sessionData["Exchange Time (" + buildAcronym(sessionOpen.toFormat("ZZZZZ")) + ")"] = sessionOpen.toFormat(formatting).toLowerCase() + " - " + sessionClose.toFormat(formatting).toLowerCase();
+			sessionData["Local Time (" + buildAcronym(localTime.toFormat("ZZZZZ")) + ")"] = sessionOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
+		}
+		
 		
 		// Countdown logic. If session open now -> "Now". If it is opening today -> Count down. If all sessions closed -> count down to next open day session.
 		if (openSessions.includes(session)) {
 			sessionData["Countdown"] = "Now";
+		} else if (exchange.nameShort == "FX") {
+				// console.log(session.name)
+				// console.log(sessionOpen.weekday);
+				// console.log(sessionClose.weekday);
+				if (time.diff(sessionClose) < 0) {
+					sessionData["Countdown"] = sessionClose.setZone("Etc/UTC").toRelative({ unit: ["hours", "minutes"] });
+				} else {
+					sessionData["Countdown"] = sessionOpen.setZone("Etc/UTC").toRelative({ unit: ["hours", "minutes"] });
+				}
 		// } else if (time.diff(sessionOpen.plus({days: daysTilNextOpen})) > 0) {
-		} else if (time.diff(sessionClose) < 0 && todayIsTradingDay) {
+		} else if (sessionClose.diffNow() < 0 && todayIsTradingDay) {
 			if ((coreClose.weekday - coreOpen.weekday)%7 < 0) {
 				sessionData["Countdown"] = sessionClose.plus({ days: -1}).toRelative({ unit: ["hours", "minutes"] });
 			} else {
@@ -178,7 +242,7 @@ function isThisDayATradingDay(exchange, time) {
 function isExchangeOpen(exchange, time) {
 	var isOpen;
 
-	normalTrading = ["core", "core2"]; 
+	normalTrading = ["core", "core2", "core3", "core4", "core5"]; 
 	
 	for (session of normalTrading) {
 		normalSession = exchange.sessions[session];
@@ -284,6 +348,24 @@ function generateListElement(exchange, time, tableData) {
 	// 	coreClose = coreClose.plus({days: -1});
 	// }
 	
+	// if (exchange.sessions.core2) {
+	// 	coreClose = coreOpen.plus({ minute: exchange.sessions.core2.duration });
+	// 	if (exchange.sessions.core3) {
+	// 		coreClose = coreClose.plus({ minute: exchange.sessions.core3.duration });
+	// 	}
+	// 	if (exchange.sessions.core4) {
+	// 		coreClose = coreClose.plus({ minute: exchange.sessions.core4.duration });
+	// 	}
+	// } else {
+	// 	coreClose = coreOpen.plus({ minute: exchange.sessions.core.duration });
+	// }
+	
+	if (exchange.nameShort == "FX") {
+		console.log(coreClose.toFormat(formatting))
+		console.log(coreOpen.weekday)
+		console.log(coreClose.weekday)
+	}
+	
 	if (exchange.sessions.core2) {
 		core2Open = time.set({ 
 			hour: exchange.sessions.core2.openHour, 
@@ -347,12 +429,14 @@ function generateListElement(exchange, time, tableData) {
 	let text = document.createElement("ul");
 	text.classList.add("exchange-info");
 	
-	let referral = document.createElement("p");
 	const localCountry = ct.getCountryForTimezone(localTime.zoneName);
 	if (exchange.nameShort == "BTC") {
-		referral.style.textAlign = "center";
-		referral.innerHTML = '<a href="https://med.etoro.com/B9459_A109752_TClick.aspx" Target="_Top"><img border="0" src="images/etoro/etoro_crypto_wide.gif" alt=" " style="border:3px solid white; border-radius:1em; overflow:hidden;" width="468" height="60" /></a>';
+		referral = document.createElement("div");
+		referral.setAttribute("class", "btc-referral");
+		// referral.style.textAlign = "center";
+		referral.innerHTML = '<a href="https://med.etoro.com/B9459_A109752_TClick_SBTC.aspx" target="_blank"><img border="0" src="images/etoro/etoro_crypto_wide.gif" alt=" " style="border:3px solid white; border-radius:1em; overflow:hidden;" width="468" height="60" /></a><p class="fallback-caption">Buy and sell Bitcoin with <a href="https://med.etoro.com/B9459_A109752_TClick_SBTC.aspx" target="_blank">eToro</a>.</p>';
 	} else {
+		referral = document.createElement("p");
 		referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks in " + localCountry.name;
 	}
 	
@@ -360,7 +444,8 @@ function generateListElement(exchange, time, tableData) {
 	if (exchange.nameShort == "BTC") {
 		// title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " + exchange.nameLong + " (" + exchange.nameShort + ") " + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>" ;
 		title.innerHTML = String.fromCodePoint(0x1F3F4,0x200D,0x2620,0xFE0F) + " " + exchange.nameLong + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>";
-
+	} else if (exchange.nameShort == "FX") {
+		title.innerHTML = String.fromCodePoint(0x1F4B1) + " " + exchange.nameLong + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>";
 	} else {
 		// title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(time.zoneName).id).emoji + " " + exchange.nameLong + " (" + exchange.nameShort.split(" ")[0] + ") " + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>";
 		title.innerHTML = countryFlagEmoji.get(ct.getCountryForTimezone(time.zoneName).id).emoji + " " + exchange.nameLong + "<time>" + time.toFormat("h':'mm' 'a").toLowerCase() + "</time>";
@@ -378,6 +463,11 @@ function generateListElement(exchange, time, tableData) {
 	if (exchange.nameShort == "BTC") {
 		text.innerHTML = "<li><b>Trading week</b> " + openDaysString[0] + " - " + openDaysString[1] + "</li>" +
 		"<li><b>Location</b> Global</li>" +
+		"<li><b>Timezone</b> " + time.toFormat("ZZZZZ") + " (UTC" + time.toFormat("ZZ") + ") " + "</li>" +
+		"<li><b>Offset</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>";
+	} else if (exchange.nameShort == "FX") {
+		text.innerHTML = "<li><b>Trading week</b> " + openDaysString[0] + " - " + openDaysString[1] + "</li>" +
+		"<li><b>Location</b> Tokyo, Frankfurt, London, New York, and Sydney</li>" +
 		"<li><b>Timezone</b> " + time.toFormat("ZZZZZ") + " (UTC" + time.toFormat("ZZ") + ") " + "</li>" +
 		"<li><b>Offset</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>";
 	} else if (exchange.city) {
@@ -398,12 +488,19 @@ function generateListElement(exchange, time, tableData) {
 	
 	let subHead2 = document.createElement("p");
 	
-	currentSessionOpenTime = time.set({ 
+	if (currentSessions[0].timeZone) {
+		currentSessionOpenTime = time.setZone(currentSessions[0].timeZone);
+	} else {
+		currentSessionOpenTime = time;
+	}
+	
+	currentSessionOpenTime = currentSessionOpenTime.set({ 
 		hour: currentSessions[0].openHour, 
 		minute: currentSessions[0].openMinute, 
 		second: 0 
 	});
 	
+	currentSessionCloseTime = currentSessionOpenTime.plus({ minutes: currentSessions[0].duration })
 	// Countdown logic
 	
 	core
@@ -416,6 +513,8 @@ function generateListElement(exchange, time, tableData) {
 		// } else if (coreClose.weekday > coreOpen.weekday) {
 		} else if ((coreClose.weekday - coreOpen.weekday)%7 < 0) {
 			countdown.innerHTML = "Closing " + coreClose.plus({days: -1}).toRelative( { unit: ["hours", "minutes"]} );
+		} else if (exchange.nameShort == "FX") {
+			countdown.innerHTML = currentSessions[0].name + " closes " + currentSessionCloseTime.toRelative( { unit: ["hours", "minutes"]} );
 		} else {
 			countdown.innerHTML = "Closing " + coreClose.toRelative( { unit: ["hours", "minutes"]} );
 		}
@@ -423,9 +522,6 @@ function generateListElement(exchange, time, tableData) {
 		// if (time > currentSessionOpenTime) { // Pre-open
 			if (time < coreClose) {
 			countdown.innerHTML = "Opening " + coreOpen.toRelative( { unit: ["hours", "minutes"]} );
-			if (exchange.nameShort == "ASX") {
-				console.log("yes")
-			}
 		} else if (currentSessions[0].name == "Lunch") {
 			countdown.innerHTML = "Re-opening " + currentSessionOpenTime.plus({ minutes: exchange.sessions.lunch.duration });
 		} else { // Extended hours 
@@ -668,13 +764,13 @@ detectAdBlock().then(function(adBlockEnabled) {
 // 	fitWidth: true
 // });	
 
-if (navigator.brave !== undefined) {
-	list = document.querySelector(".fallback-list");
-	li = document.createElement("li")
-	li.classList.add("brave");
-	li.innerHTML = "Send me a tip with Brave Rewards"
-	list.appendChild(li);
-}
+// if (navigator.brave !== undefined) {
+// 	list = document.querySelector(".fallback-list");
+// 	li = document.createElement("li")
+// 	li.classList.add("brave");
+// 	li.innerHTML = "Send me a tip with Brave Rewards"
+// 	list.appendChild(li);
+// }
 
 
 

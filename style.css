@@ -418,6 +418,15 @@ li .fallback-300 li {
 	margin-right: 1em;
 }
 
+.plus500-instrument {
+	margin: 1em auto 1em -1em;
+	width: max-content;
+}
+
+.plus500-instrument iframe {
+	background: white;
+}
+
 /* ul.exchange-list > li.ad img {
 	height: 400px;
 	padding: 1em;

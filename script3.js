@@ -143,11 +143,11 @@ function createTableData(exchange, time, daysTilNextOpen) {
 		// }
 		
 		
-			if (exchange.nameShort == "FX") {
-				console.log(session.name);
-				console.log(sessionOpen.toFormat(formatting));
-				console.log(sessionOpen.setZone("Etc/UTC").toFormat(formatting));
-			}
+			// if (exchange.nameShort == "FX") {
+			// 	console.log(session.name);
+			// 	console.log(sessionOpen.toFormat(formatting));
+			// 	console.log(sessionOpen.setZone("Etc/UTC").toFormat(formatting));
+			// }
 		
 		sessionData["className"] = key;
 		sessionData["Session"] = session.name;
@@ -168,8 +168,12 @@ function createTableData(exchange, time, daysTilNextOpen) {
 				// console.log(session.name)
 				// console.log(sessionOpen.weekday);
 				// console.log(sessionClose.weekday);
-				if (time.diff(sessionClose) < 0) {
+				if (sessionClose.diffNow() < 0) {
+					if ((sessionClose.weekday - coreOpen.weekday)%7 < 0) {
+						sessionData["Countdown"] = sessionClose.plus({ days: -1}).setZone("Etc/UTC").toRelative({ unit: ["hours", "minutes"] });
+					}
 					sessionData["Countdown"] = sessionClose.setZone("Etc/UTC").toRelative({ unit: ["hours", "minutes"] });
+					console.log(session.name)
 				} else {
 					sessionData["Countdown"] = sessionOpen.setZone("Etc/UTC").toRelative({ unit: ["hours", "minutes"] });
 				}
@@ -435,6 +439,14 @@ function generateListElement(exchange, time, tableData) {
 		referral.setAttribute("class", "btc-referral");
 		// referral.style.textAlign = "center";
 		referral.innerHTML = '<a href="https://med.etoro.com/B9459_A109752_TClick_SBTC.aspx" target="_blank"><img border="0" src="images/etoro/etoro_crypto_wide.gif" alt=" " style="border:3px solid white; border-radius:1em; overflow:hidden;" width="468" height="60" /></a><p class="fallback-caption">Buy and sell Bitcoin with <a href="https://med.etoro.com/B9459_A109752_TClick_SBTC.aspx" target="_blank">eToro</a>.</p>';
+	} else if (exchange.nameShort == "FX") {
+		referral = document.createElement("div");
+		referral.setAttribute("class", "btc-referral");
+		referral.innerHTML = '<iframe src="https://cdn.plus500.com/Media/Banners/468x60/57192/index.html?set=Forex-Phone&language=EN&country=IE&url=https%3A%2F%2Fwww.plus500.com%2FEN%2Fmarketing%2FForex%3Fid%3D131797%26pl%3D2" style="border:3px solid white; border-radius:1em; overflow:hidden;" width="468" height="60" scrolling="no" frameborder="0" style="border:none"></iframe><p class="fallback-caption">Trade forex with <a href="https://www.plus500.com/Trading/Forex?id=131797&pl=2" target="_blank">Plus500</a>.</p>'
+	} else if (exchange.plus500Symbol) {
+		referral = document.createElement("div");
+		referral.setAttribute("class", "plus500-instrument");
+		referral.innerHTML = '<iframe width="566" height="90" frameborder="0" scrolling="no" src="https://marketools.plus500.com/Widgets/SingleInstrumentContainer?hl=en&isNT=True&tl=https%3a%2f%2fwww.plus500.com%2fTrading%2fIndices%3fid%3d131797%26pl%3d2&th=Dark&id=131797&tags=widg+chart&pl=2&instSymb=' + exchange.plus500Symbol + '"></iframe><p class="fallback-caption">Trade ' + exchange.nameShort + '-listed stocks with <a href="https://www.plus500.com/Trading/Indices?id=131797&pl=2" target="_blank">Plus500</a>.</p>';
 	} else {
 		referral = document.createElement("p");
 		referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks in " + localCountry.name;
@@ -511,10 +523,10 @@ function generateListElement(exchange, time, tableData) {
 		if (exchange.nameShort == "BTC") {
 			countdown.innerHTML = "Never closes";
 		// } else if (coreClose.weekday > coreOpen.weekday) {
-		} else if ((coreClose.weekday - coreOpen.weekday)%7 < 0) {
-			countdown.innerHTML = "Closing " + coreClose.plus({days: -1}).toRelative( { unit: ["hours", "minutes"]} );
 		} else if (exchange.nameShort == "FX") {
 			countdown.innerHTML = currentSessions[0].name + " closes " + currentSessionCloseTime.toRelative( { unit: ["hours", "minutes"]} );
+		} else if ((coreClose.weekday - coreOpen.weekday)%7 < 0) {
+			countdown.innerHTML = "Closing " + coreClose.plus({days: -1}).toRelative( { unit: ["hours", "minutes"]} );
 		} else {
 			countdown.innerHTML = "Closing " + coreClose.toRelative( { unit: ["hours", "minutes"]} );
 		}

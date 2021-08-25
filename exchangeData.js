@@ -1,10 +1,56 @@
 var exchanges = {
+	"FX" : {
+		"nameLong" : "Foreign Exchange Markets",
+		"nameShort" : "FX",
+		"mic" : "XBOM",
+		"timeZone" : "Etc/UTC",
+		// "city" : "Mumbai",
+		"openDays" : [1, 2, 3, 4, 5],
+		"sessions" : {
+			"core" : {
+				"name" : "Sydney",
+				"timeZone" : "Australia/Sydney",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			},
+			"core2" : {
+				"name" : "Tokyo",
+				"timeZone" : "Asia/Tokyo",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			},
+			"core3" : {
+				"name" : "Frankfurt",
+				"timeZone" : "Europe/Berlin",
+				"openHour" : 7,
+				"openMinute" : 0,
+				"duration" : 480
+			},
+			"core4" : {
+				"name" : "London",
+				"timeZone" : "Europe/London",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			},
+			"core5" : {
+				"name" : "New York",
+				"timeZone" : "America/New_York",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			}
+		}
+	},
 	"nyse" : {
 		"nameLong" : "New York Stock Exchange",
 		"nameShort" : "NYSE",
 		"mic" : "XYNS",
 		"timeZone" : "America/New_York",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "ES",
 		"sessions" : {
 			"pre" : {
 				"name" : "Pre-Trading",
@@ -26,12 +72,28 @@ var exchanges = {
 			}
 		}
 	},
+	"btc" : {
+		"nameLong" : "Bitcoin Exchanges",
+		"nameShort" : "BTC",
+		"mic" : "N/A",
+		"timeZone" : "Etc/UTC",
+		"openDays" : [1, 2, 3, 4, 5, 6, 7],
+		"sessions" : {
+			"core" : {
+				"name" : "24/7 Trading",
+				"openHour" : 0,
+				"openMinute" : 0,
+				"duration" : 1440 
+			}
+		}
+	},
 	"nasdaq" : {
 		"nameLong" : "Nasdaq Stock Exchange",
 		"nameShort" : "Nasdaq",
 		"mic" : "XNAS",
 		"timeZone" : "America/New_York",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "NQ",
 		"sessions" : {
 			"pre" : {
 				"name" : "Opening",
@@ -59,6 +121,7 @@ var exchanges = {
 		"mic" : "XLON",
 		"timeZone" : "Europe/London",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "UK100",
 		"sessions" : {
 			"pre" : {
 				"name" : "Pre-Trading",
@@ -98,6 +161,7 @@ var exchanges = {
 		"mic" : "XHKG",
 		"timeZone" : "Asia/Hong_Kong",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "HSI",
 		"sessions" : {
 			"pre" : {
 				"name" : "Pre-Opening",
@@ -137,6 +201,7 @@ var exchanges = {
 		"mic" : "XASX",
 		"timeZone" : "Australia/Sydney",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "ASX",
 		"sessions" : {
 			"pre" : {
 				"name" : "Pre-Open",
@@ -176,6 +241,7 @@ var exchanges = {
 		"mic" : "XTKS",
 		"timeZone" : "Asia/Tokyo",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "NIY",
 		"sessions" : {
 			"core" : {
 				"name" : "Morning",
@@ -224,6 +290,7 @@ var exchanges = {
 		"mic" : "XPAR",
 		"timeZone" : "Europe/Paris",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "FCE",
 		"sessions" : {
 			"core" : {
 				"name" : "Trading",
@@ -260,6 +327,7 @@ var exchanges = {
 		"mic" : "XSWX",
 		"timeZone" : "Europe/Zurich",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "FSM",
 		"sessions" : {
 			"core" : {
 				"name" : "Trading",
@@ -272,21 +340,6 @@ var exchanges = {
 				"openHour" : 18,
 				"openMinute" : 15,
 				"duration" : 225
-			}
-		}
-	},
-	"btc" : {
-		"nameLong" : "Bitcoin Exchanges",
-		"nameShort" : "BTC",
-		"mic" : "N/A",
-		"timeZone" : "Etc/UTC",
-		"openDays" : [1, 2, 3, 4, 5, 6, 7],
-		"sessions" : {
-			"core" : {
-				"name" : "24/7 Trading",
-				"openHour" : 0,
-				"openMinute" : 0,
-				"duration" : 1440 
 			}
 		}
 	},
@@ -353,6 +406,7 @@ var exchanges = {
 		"mic" : "XCME",
 		"timeZone" : "America/Chicago",
 		"openDays" : [2, 3, 4, 5, 6, 7],
+		"plus500Symbol" : "VIX",
 		"sessions" : {
 			"pre" : {
 				"name" : "Pre-Open",
@@ -374,6 +428,7 @@ var exchanges = {
 		"mic" : "XAMS",
 		"timeZone" : "Europe/Amsterdam",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "FT",
 		"sessions" : {
 			"core" : {
 				"name" : "Trading",
@@ -395,6 +450,7 @@ var exchanges = {
 		"mic" : "XMIL",
 		"timeZone" : "Europe/Rome",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "FIBI",
 		"sessions" : {
 			"pre" : {
 				"name" : "Opening Auction",
@@ -458,6 +514,7 @@ var exchanges = {
 		"mic" : "XSHG",
 		"timeZone" : "Asia/Shanghai",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "CN",
 		"sessions" : {
 			"pre" : {
 				"name" : "Opening",
@@ -510,6 +567,7 @@ var exchanges = {
 		"timeZone" : "Asia/Shanghai",
 		"city" : "Shenzhen",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "CN",
 		"sessions" : {
 			"pre" : {
 				"name" : "Opening",
@@ -550,6 +608,7 @@ var exchanges = {
 		"timeZone" : "Asia/Kolkata",
 		"city" : "Mumbai",
 		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "IN",
 		"sessions" : {
 			"pre" : {
 				"name" : "Pre-Open",
@@ -574,51 +633,6 @@ var exchanges = {
 				"openHour" : 15,
 				"openMinute" : 40,
 				"duration" : 20
-			}
-		}
-	},
-	"FX" : {
-		"nameLong" : "Foreign Exchange Markets",
-		"nameShort" : "FX",
-		"mic" : "XBOM",
-		"timeZone" : "Etc/UTC",
-		// "city" : "Mumbai",
-		"openDays" : [1, 2, 3, 4, 5],
-		"sessions" : {
-			"core" : {
-				"name" : "Sydney",
-				"timeZone" : "Australia/Sydney",
-				"openHour" : 8,
-				"openMinute" : 0,
-				"duration" : 540
-			},
-			"core2" : {
-				"name" : "Tokyo",
-				"timeZone" : "Asia/Tokyo",
-				"openHour" : 8,
-				"openMinute" : 0,
-				"duration" : 540
-			},
-			"core3" : {
-				"name" : "Frankfurt",
-				"timeZone" : "Europe/Berlin",
-				"openHour" : 7,
-				"openMinute" : 0,
-				"duration" : 480
-			},
-			"core4" : {
-				"name" : "London",
-				"timeZone" : "Europe/London",
-				"openHour" : 8,
-				"openMinute" : 0,
-				"duration" : 540
-			},
-			"core5" : {
-				"name" : "New York",
-				"timeZone" : "America/New_York",
-				"openHour" : 8,
-				"openMinute" : 0,
-				"duration" : 540
 			}
 		}
 	}

@@ -80,10 +80,32 @@ var exchanges = {
 		"openDays" : [1, 2, 3, 4, 5, 6, 7],
 		"sessions" : {
 			"core" : {
-				"name" : "24/7 Trading",
+				"name" : "24/7 Spot Trading",
+				"timeZone" : "Etc/UTC",
 				"openHour" : 0,
 				"openMinute" : 0,
 				"duration" : 1440 
+			},
+			"gbtc" : {
+				"name" : "GBTC",
+				"timeZone" : "America/New_York",
+				"openHour" : 9,
+				"openMinute" : 30,
+				"duration" : 390 
+			},
+			"cme" : {
+				"name" : "CME Futures",
+				"timeZone" : "America/Chicago",
+				"openHour" : 17,
+				"openMinute" : 0,
+				"duration" : 1380
+			},
+			"bakkt" : {
+				"name" : "Bakkt Futures",
+				"timeZone" : "Asia/Singapore",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 1320
 			}
 		}
 	},

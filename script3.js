@@ -47,7 +47,7 @@ function whatSessionIsOpen(exchange, time) {
 		let close = open.plus({ minutes: session.duration });
 		
 				
-		if ((close.weekday - open.weekday)%7 < 0) {
+		if ((close.weekday - open.weekday)%7 > 0) {
 			open = open.plus({ days: -1 });
 		}
 	
@@ -122,7 +122,7 @@ function createTableData(exchange, time, daysTilNextOpen) {
 	for (key of data) {
 		let sessionData = {};
 		let session = exchange.sessions[key];
-		if (exchange.nameShort == "FX") {
+		if (exchange.nameShort == "FX" || exchange.nameShort == "BTC") {
 			sessionOpen = time.setZone(session.timeZone);
 		} else {
 			sessionOpen = time;
@@ -152,7 +152,7 @@ function createTableData(exchange, time, daysTilNextOpen) {
 		sessionData["className"] = key;
 		sessionData["Session"] = session.name;
 		
-		if (exchange.nameShort == "FX") {
+		if (exchange.nameShort == "FX" || exchange.nameShort == "BTC") {
 			sessionData["Exchange Time (UTC)"] = sessionOpen.setZone("Etc/UTC").toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone("Etc/UTC").toFormat(formatting).toLowerCase();
 			sessionData["Local Time (" + buildAcronym(localTime.toFormat("ZZZZZ")) + ")"] = sessionOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + sessionClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
 		} else {
@@ -164,12 +164,12 @@ function createTableData(exchange, time, daysTilNextOpen) {
 		// Countdown logic. If session open now -> "Now". If it is opening today -> Count down. If all sessions closed -> count down to next open day session.
 		if (openSessions.includes(session)) {
 			sessionData["Countdown"] = "Now";
-		} else if (exchange.nameShort == "FX") {
+		} else if (exchange.nameShort == "FX"  || exchange.nameShort == "BTC") {
 				// console.log(session.name)
 				// console.log(sessionOpen.weekday);
 				// console.log(sessionClose.weekday);
 				if (sessionClose.diffNow() < 0) {
-					if ((sessionClose.weekday - coreOpen.weekday)%7 < 0) {
+					if ((sessionClose.weekday - coreOpen.weekday)%7 > 0) {
 						sessionData["Countdown"] = sessionClose.plus({ days: -1}).setZone("Etc/UTC").toRelative({ unit: ["hours", "minutes"] });
 					}
 					sessionData["Countdown"] = sessionClose.setZone("Etc/UTC").toRelative({ unit: ["hours", "minutes"] });
@@ -273,7 +273,7 @@ function isExchangeOpen(exchange, time) {
 		// 	console.log((close.weekday - open.weekday)%7)
 		// }
 		// 
-		if ((close.weekday - open.weekday)%7 < 0) {
+		if ((close.weekday - open.weekday)%7 > 0) {
 			open = open.plus({ days: -1 });
 		}
 	
@@ -300,6 +300,54 @@ function isExchangeOpen(exchange, time) {
 
 function getDaysTilNextOpen(exchange, time) {
 	let exchangeOpenOnThisDay = isThisDayATradingDay(exchange, time);
+	let coreOpen = time.set({ 
+		hour: exchange.sessions.core.openHour, 
+		minute: exchange.sessions.core.openMinute, 
+		second: 0 
+	});
+	
+	if (exchange.sessions.core2) {
+		core2Open = time.set({ 
+			hour: exchange.sessions.core2.openHour, 
+			minute: exchange.sessions.core2.openMinute, 
+			second: 0 
+		});
+		coreClose = core2Open.plus({ minute: exchange.sessions.core2.duration });
+		if (exchange.sessions.core3) {
+			core3Open = time.set({ 
+				hour: exchange.sessions.core3.openHour, 
+				minute: exchange.sessions.core3.openMinute, 
+				second: 0 
+			});
+			coreClose = core3Open.plus({ minute: exchange.sessions.core3.duration });
+		}
+		if (exchange.sessions.core4) {
+			core4Open = time.set({ 
+				hour: exchange.sessions.core4.openHour, 
+				minute: exchange.sessions.core4.openMinute, 
+				second: 0 
+			});
+			coreClose = core3Open.plus({ minute: exchange.sessions.core4.duration });
+		}
+		if (exchange.sessions.core5) {
+			core5Open = time.set({ 
+				hour: exchange.sessions.core5.openHour, 
+				minute: exchange.sessions.core5.openMinute, 
+				second: 0 
+			});
+			coreClose = core5Open.plus({ minute: exchange.sessions.core5.duration });
+		}
+	} else {
+		coreClose = coreOpen.plus({ minute: exchange.sessions.core.duration });
+	}
+	
+	// +1 day, if core session is closed already
+	if (time > coreClose) {
+		closedForToday = 1;
+	} else {
+		closedForToday = 0;
+	}
+	
 	let daysTilNextOpen = 0;
 	for (var i=0; i < 7; i++) {
 		if (!exchangeOpenOnThisDay) {
@@ -310,7 +358,7 @@ function getDaysTilNextOpen(exchange, time) {
 			}
 		}
 	}
-	return daysTilNextOpen;
+	return daysTilNextOpen + closedForToday;
 }
 
 function generateListElement(exchange, time, tableData) {
@@ -333,15 +381,15 @@ function generateListElement(exchange, time, tableData) {
 	});
 	
 	//Testing
-	// if (exchange.nameShort == "CME GLOBEX") {
-	// 	console.log("Time: " + time.weekday)
-	// 	console.log("Open: " + coreOpen.weekday);
-	// 	console.log("Close: " + coreOpen.plus({ minute: exchange.sessions.core.duration }).weekday);
-	// 	// console.log(coreOpen.diff(time));
-	// 	// console.log(time.diff(coreOpen));
-	// 	daySessionOpened = time.plus(time.diff(coreOpen));
-	// 	console.log("day session opened: " + daySessionOpened.weekday)
-	// }
+	if (exchange.nameShort == "CME GLOBEX") {
+		console.log("Time: " + time.weekday)
+		console.log("Open: " + coreOpen.weekday);
+		console.log("Close: " + coreOpen.plus({ minute: exchange.sessions.core.duration }).weekday);
+		// console.log(coreOpen.diff(time));
+		// console.log(time.diff(coreOpen));
+		daySessionOpened = time.plus(time.diff(coreOpen));
+		console.log("day session opened: " + daySessionOpened.weekday)
+	}
 	
 	// If the session opened yesterday
 	// if (time.plus(time.diff(coreOpen)).weekday < time.weekday) {
@@ -446,7 +494,7 @@ function generateListElement(exchange, time, tableData) {
 	} else if (exchange.plus500Symbol) {
 		referral = document.createElement("div");
 		referral.setAttribute("class", "plus500-instrument");
-		referral.innerHTML = '<iframe width="566" height="90" frameborder="0" scrolling="no" src="https://marketools.plus500.com/Widgets/SingleInstrumentContainer?hl=en&isNT=True&tl=https%3a%2f%2fwww.plus500.com%2fTrading%2fIndices%3fid%3d131797%26pl%3d2&th=Dark&id=131797&tags=widg+chart&pl=2&instSymb=' + exchange.plus500Symbol + '"></iframe><p class="fallback-caption">Trade ' + exchange.nameShort + '-listed stocks with <a href="https://www.plus500.com/Trading/Indices?id=131797&pl=2" target="_blank">Plus500</a>.</p>';
+		referral.innerHTML = '<iframe width="566" height="90" frameborder="0" scrolling="no" src="https://marketools.plus500.com/Widgets/SingleInstrumentContainer?hl=en&isNT=True&tl=https%3a%2f%2fwww.plus500.com%2fTrading%2fIndices%3fid%3d131797%26pl%3d2&th=Dark&id=131797&tags=widg+chart&pl=2&instSymb=' + exchange.plus500Symbol + '"></iframe><p class="fallback-caption">Trade ' + exchange.nameShort + '-listed stock CFDs with <a href="https://www.plus500.com/Trading/Indices?id=131797&pl=2" target="_blank">Plus500</a>.</p>';
 	} else {
 		referral = document.createElement("p");
 		referral.innerHTML = "Buy and sell " + exchange.nameShort + "-listed stocks in " + localCountry.name;
@@ -479,7 +527,7 @@ function generateListElement(exchange, time, tableData) {
 		"<li><b>Offset</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>";
 	} else if (exchange.nameShort == "FX") {
 		text.innerHTML = "<li><b>Trading week</b> " + openDaysString[0] + " - " + openDaysString[1] + "</li>" +
-		"<li><b>Location</b> Tokyo, Frankfurt, London, New York, and Sydney</li>" +
+		"<li><b>Location</b> Sydney, Tokyo, Frankfurt, London, and New York</li>" +
 		"<li><b>Timezone</b> " + time.toFormat("ZZZZZ") + " (UTC" + time.toFormat("ZZ") + ") " + "</li>" +
 		"<li><b>Offset</b> " + time.zoneName.split("/")[1].replace(/_/g, ' ')  + " is " + offset["hours"] + " hours and " + offset["minutes"] + " minutes " + relativeOffset + " " + localTime.zoneName.split("/")[1].replace(/_/g, ' ') + "</li>";
 	} else if (exchange.city) {
@@ -525,22 +573,28 @@ function generateListElement(exchange, time, tableData) {
 		// } else if (coreClose.weekday > coreOpen.weekday) {
 		} else if (exchange.nameShort == "FX") {
 			countdown.innerHTML = currentSessions[0].name + " closes " + currentSessionCloseTime.toRelative( { unit: ["hours", "minutes"]} );
-		} else if ((coreClose.weekday - coreOpen.weekday)%7 < 0) {
+		} else if ((coreClose.weekday - coreOpen.weekday)%7 > 0) {
 			countdown.innerHTML = "Closing " + coreClose.plus({days: -1}).toRelative( { unit: ["hours", "minutes"]} );
 		} else {
 			countdown.innerHTML = "Closing " + coreClose.toRelative( { unit: ["hours", "minutes"]} );
 		}
 	} else if (currentSessions[0].name != "Closed") { // Extended open
 		// if (time > currentSessionOpenTime) { // Pre-open
-			if (time < coreClose) {
+		if (time < coreClose) {
 			countdown.innerHTML = "Opening " + coreOpen.toRelative( { unit: ["hours", "minutes"]} );
 		} else if (currentSessions[0].name == "Lunch") {
 			countdown.innerHTML = "Re-opening " + currentSessionOpenTime.plus({ minutes: exchange.sessions.lunch.duration });
 		} else { // Extended hours 
 			countdown.innerHTML = "Closed " + coreClose.toRelative( { unit: ["hours", "minutes"]} );
 		}
+	// } else if (time < midnight) {
+	// 	countdown.innerHTML = "Closed " + coreClose.toRelative( { unit: ["hours", "minutes"]} );
 	} else {
+		if (daysTilNextOpen == 1) {
+			countdown.innerHTML = "Closed " + coreClose.toRelative( { unit: ["hours", "minutes"]} );
+		} else {
 		countdown.innerHTML = "Opening " + coreOpen.plus({ days: daysTilNextOpen }).toRelative( { unit: ["hours", "minutes"]} );
+	}
 	}
 
 	// Regualr trading is " + coreOpenString + ", Monday - Friday.";

@@ -52,6 +52,23 @@ h1 time {
 	min-width: 5em; 
 }
 
+.btc-title:before {
+	/* background-image: url(https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/BTC_Logo.svg/1200px-BTC_Logo.svg.png); */
+	background-image: url(images/btc-flag.png);
+	background-size: 1.2em;
+	display: inline-block;
+	width: 1.2em;
+	height: 1.2em;
+	/* margin-top: 2px; */
+	content: "";
+	position: absolute;
+}
+
+.btc-title span {
+	left: 1.35em;
+	position: relative;
+}
+
 h1.countdown {
 	text-align: center;
 	margin-top: 0.5em;

@@ -1,10 +1,9 @@
 var exchanges = {
-	"FX" : {
+	"fx" : {
 		"nameLong" : "Foreign Exchange Markets",
 		"nameShort" : "FX",
-		"mic" : "XBOM",
+		// "mic" : "XBOM",
 		"timeZone" : "Etc/UTC",
-		// "city" : "Mumbai",
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
 			"core" : {
@@ -41,6 +40,52 @@ var exchanges = {
 				"openHour" : 8,
 				"openMinute" : 0,
 				"duration" : 540
+			}
+		}
+	},
+	"gold" : {
+		"nameLong" : "Gold OTC and Exchanges",
+		"nameShort" : "XAU",
+		// "mic" : "XBOM",
+		"timeZone" : "Etc/UTC",
+		"openDays" : [1, 2, 3, 4, 5],
+		"sessions" : {
+			"core" : {
+				"name" : "Loco London OTC",
+				"timeZone" : "Europe/London",
+				"openHour" : 0,
+				"openMinute" : 0,
+				"duration" : 1440
+			},
+			"cme" : {
+				"name" : "CME COMEX",
+				"timeZone" : "America/Chicago",
+				"openHour" : 17,
+				"openMinute" : 0,
+				"duration" : 1380
+			},
+			"lme" : {
+				"name" : "LMEprecious",
+				"timeZone" : "Europe/London",
+				"openHour" : 13,
+				"openMinute" : 0,
+				"duration" : 420
+			},
+			"shfe" : {
+				"name" : "Shanghai Futures Exchange",
+				"nameShort" : "SHFE",
+				"timeZone" : "Asia/Shanghai",
+				"openHour" : 9,
+				"openMinute" : 0,
+				"duration" : 360
+			},
+			"sge" : {
+				"name" : "Shanghai Gold Exchange",
+				"nameShort" : "SGE",
+				"timeZone" : "Asia/Shanghai",
+				"openHour" : 9,
+				"openMinute" : 0,
+				"duration" : 390
 			}
 		}
 	},
@@ -530,7 +575,7 @@ var exchanges = {
 			}
 		}
 	},
-	"SSE" : {
+	"sse" : {
 		"nameLong" : "Shanghai Stock Exchange",
 		"nameShort" : "SSE",
 		"mic" : "XSHG",
@@ -582,7 +627,7 @@ var exchanges = {
 			}
 		}
 	},
-	"SZSE" : {
+	"szse" : {
 		"nameLong" : "Shenzhen Stock Exchange",
 		"nameShort" : "SZSE",
 		"mic" : "XSHE",
@@ -623,7 +668,7 @@ var exchanges = {
 			}
 		}
 	},
-	"BSE" : {
+	"bse" : {
 		"nameLong" : "Bombay Stock Exchange",
 		"nameShort" : "BSE",
 		"mic" : "XBOM",
@@ -655,6 +700,107 @@ var exchanges = {
 				"openHour" : 15,
 				"openMinute" : 40,
 				"duration" : 20
+			}
+		}
+	},
+	"otc" : {
+		"nameLong" : "OTC Markets U.S.",
+		"nameShort" : "OTC",
+		"mic" : "OTCM",
+		"timeZone" : "America/New_York",
+		"openDays" : [1, 2, 3, 4, 5],
+		"sessions" : {
+			"pre" : {
+				"name" : "OTC Link ATS",
+				"openHour" : 6,
+				"openMinute" : 0,
+				"duration" : 210
+			},
+			"core" : {
+				"name" : "Normal",
+				"openHour" : 9,
+				"openMinute" : 30,
+				"duration" : 390
+			},
+			"after" : {
+				"name" : "OTC Link ATS",
+				"openHour" : 16,
+				"openMinute" : 00,
+				"duration" : 60
+			}
+		}
+	},
+	"vse" : {
+		"nameLong" : "Vienna Stock Exchange",
+		"nameShort" : "VSE",
+		"mic" : "XWBO",
+		"timeZone" : "Europe/Vienna",
+		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "ATX",
+		"sessions" : {
+			"pre" : {
+				"name" : "Pre-Trading",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 55
+			},
+			"auction" : {
+				"name" : "Opening Auction",
+				"openHour" : 8,
+				"openMinute" : 55,
+				"duration" : 5
+			},
+			"core" : {
+				"name" : "Continuous Trading",
+				"openHour" : 9,
+				"openMinute" : 0,
+				"duration" : 180
+			},
+			"auction2" : {
+				"name" : "Intraday Auction",
+				"openHour" : 12,
+				"openMinute" : 0,
+				"duration" : 3
+			},
+			"core2" : {
+				"name" : "Continuous Trading",
+				"openHour" : 12,
+				"openMinute" : 03,
+				"duration" : 327
+			},
+			"auction3" : {
+				"name" : "Closing Auction",
+				"openHour" : 17,
+				"openMinute" : 30,
+				"duration" : 5
+			},
+			"close" : {
+				"name" : "Trade at Close",
+				"openHour" : 17,
+				"openMinute" : 35,
+				"duration" : 10
+			},
+			"after" : {
+				"name" : "Post-Trading",
+				"openHour" : 17,
+				"openMinute" : 45,
+				"duration" : 5
+			}
+		}
+	},
+	"omxc" : {
+		"nameLong" : "Nasdaq Copenhagen",
+		"nameShort" : "OMXC",
+		"mic" : "XCSE",
+		"timeZone" : "Europe/Copenhagen",
+		"openDays" : [1, 2, 3, 4, 5],
+		"plus500Symbol" : "DKK25",
+		"sessions" : {
+			"core" : {
+				"name" : "Normal",
+				"openHour" : 9,
+				"openMinute" : 0,
+				"duration" : 480
 			}
 		}
 	}

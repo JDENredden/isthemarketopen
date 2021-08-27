@@ -274,7 +274,7 @@ function isExchangeOpen(exchange, time) {
 		
 
 		
-		if (exchange.nameShort == "Tadawul") {
+		if (exchange.nameShort == "CME GLOBEX") {
 			console.log("isOpen: " + isOpen);
 			console.log("open: " + open.weekday);
 			console.log("close: " + close.weekday);
@@ -370,9 +370,6 @@ function getDaysTilNextOpen(exchange, time) {
 		}
 	}
 	
-	if (exchange.nameShort == "Tadawul") {
-		console.log(daysTilNextOpen + closedForToday);
-	}
 	return daysTilNextOpen + closedForToday;
 }
 
@@ -427,7 +424,7 @@ function generateListElement(exchange, time, tableData) {
 	// 	coreClose = coreOpen.plus({ minute: exchange.sessions.core.duration });
 	// }
 	
-	if (exchange.nameShort == "Tadawul") {
+	if (exchange.nameShort == "CME GLOBEX") {
 		console.log(coreClose.toFormat(formatting))
 		console.log(coreOpen.weekday)
 		console.log(coreClose.weekday)
@@ -445,9 +442,9 @@ function generateListElement(exchange, time, tableData) {
 	} 
 	
 	// If session closes the day after it opened.
-	// if (coreClose.weekday - time.weekday < 0) {
-	// 	coreClose = coreClose.plus({days: -1});
-	// }
+	if ((coreClose.weekday - open.weekday)%7 > 0) {
+		coreClose = coreClose.plus({days: -1});
+	}
 	
 	let coreOpenString = coreOpen.setZone(localTimeZone).toFormat(formatting).toLowerCase() + " - " + coreClose.setZone(localTimeZone).toFormat(formatting).toLowerCase();
 	

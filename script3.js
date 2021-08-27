@@ -118,6 +118,14 @@ function createTableData(exchange, time, daysTilNextOpen) {
 			});
 			coreClose = core5Open.plus({ minute: exchange.sessions.core5.duration });
 		}
+		if (exchange.sessions.core6) {
+			core6Open = time.set({ 
+				hour: exchange.sessions.core6.openHour, 
+				minute: exchange.sessions.core6.openMinute, 
+				second: 0 
+			});
+			coreClose = core6Open.plus({ minute: exchange.sessions.core6.duration });
+		}
 	} else {
 		coreClose = coreOpen.plus({ minute: exchange.sessions.core.duration });
 	}
@@ -249,7 +257,7 @@ function isThisDayATradingDay(exchange, time) {
 function isExchangeOpen(exchange, time) {
 	var isOpen;
 
-	normalTrading = ["core", "core2", "core3", "core4", "core5"]; 
+	normalTrading = ["core", "core2", "core3", "core4", "core5", "core6"]; 
 	
 	for (session of normalTrading) {
 		normalSession = exchange.sessions[session];

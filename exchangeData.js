@@ -7,34 +7,42 @@ var exchanges = {
 		"openDays" : [1, 2, 3, 4, 5],
 		"sessions" : {
 			"core" : {
+				"name" : "Wellington",
+				"timeZone" : "Pacific/Auckland",
+				"city" : "Wellington",
+				"openHour" : 8,
+				"openMinute" : 0,
+				"duration" : 540
+			},
+			"core2" : {
 				"name" : "Sydney",
 				"timeZone" : "Australia/Sydney",
 				"openHour" : 8,
 				"openMinute" : 0,
 				"duration" : 540
 			},
-			"core2" : {
+			"core3" : {
 				"name" : "Tokyo",
 				"timeZone" : "Asia/Tokyo",
 				"openHour" : 8,
 				"openMinute" : 0,
 				"duration" : 540
 			},
-			"core3" : {
+			"core4" : {
 				"name" : "Frankfurt",
 				"timeZone" : "Europe/Berlin",
 				"openHour" : 7,
 				"openMinute" : 0,
 				"duration" : 480
 			},
-			"core4" : {
+			"core5" : {
 				"name" : "London",
 				"timeZone" : "Europe/London",
 				"openHour" : 8,
 				"openMinute" : 0,
 				"duration" : 540
 			},
-			"core5" : {
+			"core6" : {
 				"name" : "New York",
 				"timeZone" : "America/New_York",
 				"openHour" : 8,
